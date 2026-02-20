@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>タイピングクエスト ⚔️</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --grass:#4a8c2a;--grass-light:#5da03a;--dirt:#8b6914;--dirt-dark:#6b4f0a;
+  --stone:#7f7f7f;--stone-dark:#5a5a5a;--stone-light:#999;
+  --wood:#b8945a;--wood-dark:#96763e;--wood-light:#d4b07a;
+  --hp-red:#e74c3c;--hp-bg:#555;--xp-green:#2ecc71;--mana-blue:#3498db;
+  --gold:#f1c40f;--text-white:#f0f0f0;--text-shadow:#222;
+  --correct:#2ecc71;--wrong:#e74c3c;--cursor:#f1c40f;
+  --panel-bg:rgba(40,30,20,0.92);--panel-border:#6b4f0a;
+}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'DotGothic16','Press Start 2P',monospace}
+body{
+  background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 45%,var(--grass) 45%,var(--grass-light) 50%,var(--dirt) 55%,var(--dirt-dark) 100%);
+  color:var(--text-white);display:flex;align-items:center;justify-content:center;
+}
+canvas#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100}
+
+/* ===== SCREENS ===== */
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:800px;padding:20px;text-align:center}
+.screen.active{display:flex}
+
+/* ===== PIXEL PANEL ===== */
+.panel{
+  background:var(--panel-bg);border:4px solid var(--panel-border);
+  border-radius:4px;padding:24px;margin:12px 0;width:100%;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,0.05),0 8px 32px rgba(0,0,0,0.5);
+  image-rendering:pixelated;
+}
+.panel-stone{border-color:var(--stone-dark);background:rgba(60,60,60,0.92)}
+
+/* ===== TYPOGRAPHY ===== */
+h1{font-family:'Press Start 2P',monospace;font-size:clamp(20px,5vw,36px);color:var(--gold);text-shadow:3px 3px 0 #222,0 0 20px rgba(241,196,15,0.3);margin-bottom:8px;line-height:1.4}
+h2{font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,22px);color:var(--text-white);text-shadow:2px 2px 0 #222;margin-bottom:12px}
+.subtitle{font-size:clamp(10px,2.5vw,14px);color:#ccc;margin-bottom:20px;font-family:'Press Start 2P',monospace}
+
+/* ===== BUTTONS ===== */
+.btn{
+  font-family:'Press Start 2P',monospace;font-size:clamp(12px,2.5vw,16px);
+  padding:16px 32px;margin:8px;cursor:pointer;border:none;
+  background:linear-gradient(180deg,var(--wood-light),var(--wood),var(--wood-dark));
+  color:#fff;text-shadow:1px 1px 0 #222;border-radius:4px;
+  box-shadow:0 4px 0 var(--wood-dark),0 6px 12px rgba(0,0,0,0.3);
+  transition:all 0.1s;image-rendering:pixelated;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--wood-dark),0 8px 16px rgba(0,0,0,0.3)}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--wood-dark)}
+.btn-danger{background:linear-gradient(180deg,#e57373,var(--hp-red),#c0392b);box-shadow:0 4px 0 #962d22}
+.btn-small{font-size:10px;padding:8px 16px}
+
+/* ===== TITLE SCREEN ===== */
+.title-logo{font-size:60px;margin-bottom:8px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5))}
+.name-input{
+  font-family:'Press Start 2P',monospace;font-size:16px;
+  padding:12px 20px;background:rgba(0,0,0,0.6);border:3px solid var(--gold);
+  color:var(--gold);text-align:center;border-radius:4px;width:280px;
+  outline:none;margin:12px 0;
+}
+.name-input::placeholder{color:rgba(241,196,15,0.4)}
+.name-input:focus{box-shadow:0 0 15px rgba(241,196,15,0.3)}
+
+/* ===== BATTLE SCREEN ===== */
+.battle-area{width:100%}
+.monster-zone{text-align:center;margin-bottom:16px}
+.monster-sprite{font-size:clamp(60px,15vw,100px);animation:monsterBounce 2s ease-in-out infinite;display:inline-block}
+.monster-sprite.hit{animation:monsterHit 0.3s ease}
+.monster-sprite.defeated{animation:monsterDefeat 0.8s ease forwards}
+.monster-name{font-family:'Press Start 2P',monospace;font-size:clamp(12px,2.5vw,16px);margin:8px 0;color:var(--gold)}
+.monster-stage{font-size:clamp(9px,2vw,11px);color:#aaa;font-family:'Press Start 2P',monospace;margin-bottom:8px}
+
+/* HP Bar */
+.hp-bar-container{width:80%;max-width:350px;margin:0 auto 16px;position:relative}
+.hp-bar-bg{height:20px;background:var(--hp-bg);border-radius:2px;border:2px solid #333;overflow:hidden}
+.hp-bar-fill{height:100%;background:linear-gradient(180deg,#e74c3c,#c0392b);transition:width 0.3s;border-radius:1px}
+.hp-bar-fill.low{background:linear-gradient(180deg,#e67e22,#d35400)}
+.hp-bar-fill.critical{background:linear-gradient(180deg,#e74c3c,#8e0000);animation:hpPulse 0.5s ease infinite}
+.hp-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Press Start 2P',monospace;font-size:10px;text-shadow:1px 1px 0 #000;z-index:1}
+
+/* ===== TYPING ZONE ===== */
+.typing-zone{margin:16px 0}
+.word-display{
+  font-family:'Press Start 2P',monospace;font-size:clamp(18px,5vw,32px);
+  letter-spacing:4px;padding:20px;min-height:80px;
+  display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px;
+  background:rgba(0,0,0,0.4);border-radius:4px;border:2px solid var(--stone-dark);
+  margin-bottom:4px;
+}
+.char{display:inline-block;padding:2px;border-bottom:3px solid transparent;transition:all 0.1s}
+.char.correct{color:var(--correct);border-bottom-color:var(--correct)}
+.char.wrong{color:var(--wrong);background:rgba(231,76,60,0.2);border-bottom-color:var(--wrong)}
+.char.current{border-bottom-color:var(--cursor);animation:cursorBlink 0.8s step-end infinite}
+.char.pending{color:rgba(255,255,255,0.3)}
+
+.typing-hint{font-size:10px;color:#888;font-family:'Press Start 2P',monospace;margin-top:4px}
+
+/* ===== KEYBOARD GUIDE ===== */
+.keyboard{margin:16px auto;max-width:680px}
+.kb-row{display:flex;justify-content:center;margin:3px 0;gap:3px}
+.kb-key{
+  font-family:'Press Start 2P',monospace;font-size:clamp(8px,1.8vw,12px);
+  min-width:clamp(24px,5.5vw,44px);height:clamp(28px,6vw,40px);
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#666,#444);border:2px solid #555;
+  border-radius:3px;color:#ccc;box-shadow:0 2px 0 #333;
+  transition:all 0.1s;
+}
+.kb-key.active{background:var(--gold);color:#222;border-color:#b8960f;transform:translateY(2px);box-shadow:none}
+.kb-key.correct-key{background:var(--correct);color:#fff;border-color:#27ae60}
+.kb-key.space{min-width:clamp(120px,30vw,220px)}
+.kb-key.wide{min-width:clamp(40px,9vw,70px)}
+
+/* ===== PLAYER STATS ===== */
+.stats-bar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  width:100%;padding:8px 16px;margin-bottom:8px;
+  background:rgba(0,0,0,0.5);border:2px solid var(--stone-dark);border-radius:4px;
+}
+.stat-item{font-family:'Press Start 2P',monospace;font-size:clamp(8px,1.8vw,11px);display:flex;align-items:center;gap:4px}
+.stat-label{color:#aaa}
+.stat-value{color:var(--gold)}
+.xp-bar-mini{width:100px;height:8px;background:#333;border-radius:2px;overflow:hidden;border:1px solid #555}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--xp-green),#27ae60);transition:width 0.5s}
+
+/* ===== COMBO ===== */
+.combo{font-family:'Press Start 2P',monospace;font-size:clamp(10px,2vw,14px);color:var(--gold);margin:4px 0;min-height:24px}
+.combo.fire{color:#e74c3c;animation:comboPulse 0.3s}
+.combo.ultra{color:#9b59b6;animation:comboPulse 0.3s;font-size:clamp(12px,2.5vw,18px)}
+.wpm-display{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mana-blue)}
+
+/* ===== LEVEL UP SCREEN ===== */
+.levelup-number{font-family:'Press Start 2P',monospace;font-size:clamp(48px,12vw,80px);color:var(--gold);text-shadow:0 0 30px rgba(241,196,15,0.5);animation:levelPop 0.5s ease}
+.levelup-label{font-family:'Press Start 2P',monospace;font-size:clamp(14px,3vw,20px);color:var(--xp-green);margin-bottom:8px}
+.reward-text{font-family:'Press Start 2P',monospace;font-size:clamp(10px,2vw,13px);color:var(--mana-blue);margin:8px 0}
+
+/* ===== RESULTS / PROFILE ===== */
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;width:100%}
+.result-item{text-align:center;padding:12px}
+.result-item .label{font-family:'Press Start 2P',monospace;font-size:9px;color:#aaa;margin-bottom:6px}
+.result-item .value{font-family:'Press Start 2P',monospace;font-size:clamp(16px,4vw,24px);color:var(--gold)}
+
+/* Ranking */
+.ranking-list{width:100%;text-align:left}
+.ranking-entry{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.1);font-family:'Press Start 2P',monospace;font-size:10px}
+.ranking-entry.mine{background:rgba(241,196,15,0.1);border:1px solid var(--gold)}
+.ranking-entry .rank{color:var(--gold);min-width:30px}
+.ranking-entry .name{flex:1;margin:0 12px}
+.ranking-entry .score{color:var(--xp-green)}
+.ranking-podium{font-size:24px;margin-bottom:4px}
+
+/* visitor counter */
+.visitor-count{font-family:'Press Start 2P',monospace;font-size:9px;color:#777;margin-top:16px}
+
+/* ===== ANIMATIONS ===== */
+@keyframes monsterBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes monsterHit{0%{transform:translateX(0)}25%{transform:translateX(-15px) rotate(-5deg)}50%{transform:translateX(15px) rotate(5deg)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+@keyframes monsterDefeat{0%{transform:scale(1);opacity:1}50%{transform:scale(1.2) rotate(10deg);opacity:0.7}100%{transform:scale(0) rotate(180deg);opacity:0}}
+@keyframes cursorBlink{0%,100%{border-bottom-color:var(--cursor)}50%{border-bottom-color:transparent}}
+@keyframes comboPulse{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+@keyframes levelPop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes hpPulse{0%,100%{opacity:1}50%{opacity:0.6}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.shake{animation:shake 0.3s ease}
+
+/* ===== FREE TYPING ===== */
+.free-input{
+  font-family:'Press Start 2P',monospace;font-size:14px;width:100%;padding:12px;
+  background:rgba(0,0,0,0.5);border:2px solid var(--stone);color:var(--text-white);
+  border-radius:4px;resize:none;height:120px;outline:none;
+}
+.free-input:focus{border-color:var(--gold)}
+.free-stats{display:flex;gap:20px;justify-content:center;margin-top:8px;font-family:'Press Start 2P',monospace;font-size:10px;color:#aaa}
+
+/* ===== LOGIN ===== */
+.login-section{margin:12px 0}
+.login-input{font-family:'Press Start 2P',monospace;font-size:12px;padding:8px 16px;background:rgba(0,0,0,0.5);border:2px solid var(--stone);color:var(--text-white);border-radius:4px;width:200px;outline:none;text-align:center}
+.login-input:focus{border-color:var(--gold)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:600px){
+  .result-grid{grid-template-columns:1fr}
+  .keyboard{transform:scale(0.9);transform-origin:center}
+  .panel{padding:16px}
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<!-- ===== TITLE SCREEN ===== -->
+<div id="title-screen" class="screen active">
+  <div class="title-logo">⚔️</div>
+  <h1>タイピングクエスト</h1>
+  <p class="subtitle">〜 キーボードの勇者 〜</p>
+  <div class="panel" style="max-width:420px">
+    <p style="font-family:'Press Start 2P';font-size:11px;color:#ccc;margin-bottom:16px">ぼうけんしゃの なまえを いれてね</p>
+    <input type="text" id="player-name" class="name-input" placeholder="なまえ" maxlength="12" autofocus>
+    <br>
+    <button class="btn" onclick="Game.startAdventure()" id="start-btn">ぼうけんに でる</button>
+    <br>
+    <button class="btn btn-small" style="margin-top:8px" onclick="Game.showScreen('free-screen')">じゆうれんしゅう</button>
+    <button class="btn btn-small" onclick="Game.showScreen('ranking-screen')">ランキング</button>
+  </div>
+  <div class="visitor-count" id="visitor-count"></div>
+</div>
+
+<!-- ===== BATTLE SCREEN ===== -->
+<div id="battle-screen" class="screen">
+  <div class="stats-bar">
+    <div class="stat-item"><span class="stat-label">Lv.</span><span class="stat-value" id="s-level">1</span></div>
+    <div class="stat-item"><span class="stat-label">⭐</span><div class="xp-bar-mini"><div class="xp-bar-fill" id="s-xp-bar" style="width:0%"></div></div></div>
+    <div class="stat-item"><span class="stat-label">🔥</span><span class="stat-value" id="s-streak">0</span></div>
+    <div class="stat-item"><span class="stat-label">⚔️</span><span class="stat-value" id="s-words">0</span></div>
+    <div class="stat-item wpm-display" id="s-wpm"></div>
+  </div>
+
+  <div class="battle-area">
+    <div class="monster-zone">
+      <div class="monster-stage" id="m-stage">ステージ 1</div>
+      <div class="monster-sprite" id="m-sprite">🟢</div>
+      <div class="monster-name" id="m-name">スライム</div>
+      <div class="hp-bar-container">
+        <div class="hp-text" id="m-hp-text">30 / 30</div>
+        <div class="hp-bar-bg"><div class="hp-bar-fill" id="m-hp-bar" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <div class="panel" style="padding:16px">
+      <div class="combo" id="combo-text"></div>
+      <div class="word-display" id="word-display"></div>
+      <div class="typing-hint">キーボードで うちこもう！ まちがえたら Backspace でけせるよ</div>
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+  </div>
+  <button class="btn btn-small btn-danger" style="margin-top:8px" onclick="Game.backToTitle()">やめる</button>
+</div>
+
+<!-- ===== LEVEL UP SCREEN ===== -->
+<div id="levelup-screen" class="screen">
+  <div class="panel" style="max-width:400px">
+    <div class="levelup-label">⬆️ レベルアップ！</div>
+    <div class="levelup-number" id="lu-level">2</div>
+    <div class="reward-text" id="lu-reward"></div>
+    <button class="btn" onclick="Game.continueBattle()">つづける</button>
+  </div>
+</div>
+
+<!-- ===== STAGE CLEAR SCREEN ===== -->
+<div id="stageclear-screen" class="screen">
+  <div class="panel" style="max-width:450px">
+    <h2>🎉 ステージクリア！</h2>
+    <div class="result-grid" id="stage-results"></div>
+    <button class="btn" onclick="Game.nextStage()">つぎのステージへ</button>
+    <button class="btn btn-small" onclick="Game.backToTitle()">タイトルにもどる</button>
+  </div>
+</div>
+
+<!-- ===== FREE TYPING SCREEN ===== -->
+<div id="free-screen" class="screen">
+  <div class="panel" style="max-width:500px">
+    <h2>📝 じゆうれんしゅう</h2>
+    <p style="font-size:11px;color:#aaa;margin-bottom:12px;font-family:'Press Start 2P'">すきなぶんしょうを うってみよう</p>
+    <textarea id="free-input" class="free-input" placeholder="ここに なにか うってみよう..."></textarea>
+    <div class="free-stats">
+      <span>もじすう: <span id="free-chars">0</span></span>
+      <span>たんご: <span id="free-words">0</span></span>
+      <span>ぎょう: <span id="free-lines">1</span></span>
+    </div>
+    <button class="btn btn-small" style="margin-top:12px" onclick="Game.showScreen('title-screen')">もどる</button>
+  </div>
+</div>
+
+<!-- ===== RANKING SCREEN ===== -->
+<div id="ranking-screen" class="screen">
+  <div class="panel" style="max-width:500px">
+    <h2>🏆 ランキング</h2>
+    <div class="ranking-list" id="ranking-list">
+      <p style="font-size:11px;color:#aaa;text-align:center;font-family:'Press Start 2P'">まだ データが ないよ</p>
+    </div>
+    <button class="btn btn-small" style="margin-top:16px" onclick="Game.showScreen('title-screen')">もどる</button>
+  </div>
+</div>
+
+<script>
+/* ===== PARTICLE SYSTEM ===== */
+const cvs = document.getElementById('particles');
+const ctx = cvs.getContext('2d');
+let particles = [];
+function resizeCanvas(){cvs.width=window.innerWidth;cvs.height=window.innerHeight}
+window.addEventListener('resize',resizeCanvas);resizeCanvas();
+
+function spawnParticles(x,y,color,count=10){
+  for(let i=0;i<count;i++){
+    particles.push({x,y,vx:(Math.random()-0.5)*6,vy:(Math.random()-0.5)*6-2,life:1,color,size:Math.random()*4+2});
+  }
+}
+function spawnExplosion(x,y){
+  const colors=['#f1c40f','#e74c3c','#2ecc71','#3498db','#9b59b6','#e67e22'];
+  for(let i=0;i<30;i++){
+    const a=Math.random()*Math.PI*2,s=Math.random()*8+2;
+    particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:colors[i%colors.length],size:Math.random()*6+3});
+  }
+}
+function updateParticles(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  particles=particles.filter(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.1;p.life-=0.02;
+    if(p.life<=0)return false;
+    ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
+    ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
+    return true;
+  });
+  ctx.globalAlpha=1;
+  requestAnimationFrame(updateParticles);
+}
+updateParticles();
+
+/* ===== AUDIO (Web Audio API) ===== */
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+let audioCtx;
+function initAudio(){if(!audioCtx)audioCtx=new AudioCtx()}
+function playSound(freq,dur=0.1,type='square'){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type=type;o.frequency.value=freq;
+  g.gain.setValueAtTime(0.15,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+  o.start();o.stop(audioCtx.currentTime+dur);
+}
+function sfxType(){playSound(880,0.05)}
+function sfxCorrect(){playSound(523,0.1);playSound(659,0.1)}
+function sfxWrong(){playSound(200,0.2,'sawtooth')}
+function sfxLevelUp(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>playSound(f,0.15,'triangle'),i*100))}
+function sfxDefeat(){[784,880,1047,1319].forEach((f,i)=>setTimeout(()=>playSound(f,0.2,'triangle'),i*80))}
+
+/* ===== WORD DATA ===== */
+const WORDS = {
+  1:[
+    "cat","dog","sun","ice","fire","atom","cell","star","moon","fish",
+    "code","data","game","hero","rock","wind","rain","tree","bird","gem",
+    "key","map","axe","bow","egg","fox","hat","jar","net","orb"
+  ],
+  2:[
+    "sword","magic","quest","block","craft","laser","robot","orbit","force","light",
+    "shield","spell","armor","power","speed","virus","brain","heart","plant","pixel",
+    "slime","forge","flame","frost","steam","toxic","ultra","arena","bonus","combo"
+  ],
+  3:[
+    "dragon","potion","portal","planet","rocket","galaxy","energy","plasma","zombie","spider",
+    "golem","emerald","diamond","redstone","creeper","enderman","skeleton","science","element","formula",
+    "oxygen","carbon","proton","neuron","genome","enzyme","fossil","magnet","prism","quartz"
+  ],
+  4:[
+    "molecule","electron","gravity","dinosaur","chemistry","adventure","telescope","explosion","evolution","biosphere",
+    "enchantment","minecraft","ecosystem","chromosome","photon beam","dark matter","black hole","supernova","algorithm","cybernetic",
+    "quantum","asteroid","bacteria","catalyst","periodic","spectrum","velocity","organism","mutation","synthetic"
+  ],
+  5:[
+    "photosynthesis","electromagnetic","deoxyribonucleic","thermonuclear","extraterrestrial",
+    "the quick brown fox","science is awesome","never stop exploring","to infinity and beyond","knowledge is power",
+    "atoms make everything","stars light the sky","code builds the future","dragons breathe fire","the universe is vast"
+  ]
+};
+
+/* ===== MONSTERS ===== */
+const MONSTERS = [
+  {name:'スライム',sprite:'🟢',hp:30,xp:20},
+  {name:'コウモリ',sprite:'🦇',hp:50,xp:35},
+  {name:'スケルトン',sprite:'💀',hp:80,xp:55},
+  {name:'ゾンビ',sprite:'🧟',hp:120,xp:80},
+  {name:'クモ',sprite:'🕷️',hp:100,xp:70},
+  {name:'ウィッチ',sprite:'🧙',hp:150,xp:100},
+  {name:'ブレイズ',sprite:'🔥',hp:180,xp:120},
+  {name:'ガーディアン',sprite:'🐡',hp:200,xp:140},
+  {name:'エンダーマン',sprite:'👾',hp:250,xp:170},
+  {name:'ドラゴン',sprite:'🐉',hp:350,xp:250},
+  {name:'ウィザー',sprite:'☠️',hp:500,xp:400},
+];
+
+/* ===== KEYBOARD LAYOUT ===== */
+const KB_ROWS=[
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['Z','X','C','V','B','N','M'],
+];
+
+function buildKeyboard(){
+  const kb=document.getElementById('keyboard');
+  kb.innerHTML='';
+  KB_ROWS.forEach((row,ri)=>{
+    const rowEl=document.createElement('div');
+    rowEl.className='kb-row';
+    if(ri===2){
+      const bs=document.createElement('div');
+      bs.className='kb-key wide';bs.textContent='⌫';bs.id='kb-Backspace';
+      rowEl.appendChild(bs);
+    }
+    row.forEach(k=>{
+      const key=document.createElement('div');
+      key.className='kb-key';key.textContent=k;key.id='kb-'+k;
+      rowEl.appendChild(key);
+    });
+    kb.appendChild(rowEl);
+  });
+  const spaceRow=document.createElement('div');
+  spaceRow.className='kb-row';
+  const sp=document.createElement('div');
+  sp.className='kb-key space';sp.textContent='SPACE';sp.id='kb-Space';
+  spaceRow.appendChild(sp);
+  kb.appendChild(spaceRow);
+}
+
+function highlightKey(keyChar,cls='active'){
+  const id='kb-'+keyChar.toUpperCase();
+  const el=document.getElementById(id);
+  if(el){el.classList.add(cls);setTimeout(()=>el.classList.remove(cls),200)}
+}
+function showNextKey(keyChar){
+  document.querySelectorAll('.kb-key').forEach(k=>k.classList.remove('correct-key'));
+  if(!keyChar)return;
+  const id=keyChar===' '?'kb-Space':'kb-'+keyChar.toUpperCase();
+  const el=document.getElementById(id);
+  if(el)el.classList.add('correct-key');
+}
+
+/* ===== GAME ===== */
+const Game={
+  player:{name:'',level:1,xp:0,xpToNext:100,wordsTyped:0,bestWPM:0,bestStreak:0,totalChars:0},
+  stage:1,
+  monster:null,monsterHp:0,monsterMaxHp:0,monstersDefeated:0,
+  word:'',chars:[],cursor:0,hasError:false,
+  streak:0,wordStartTime:0,stageStartTime:0,stageWords:0,stageChars:0,stageErrors:0,
+  wordsInStage:0,wordsPerStage:8,
+
+  init(){
+    this.loadProgress();
+    document.getElementById('player-name').value=this.player.name;
+    buildKeyboard();
+    this.updateVisitorCount();
+    document.getElementById('player-name').addEventListener('keydown',e=>{
+      if(e.key==='Enter')this.startAdventure();
+    });
+
+    // Free typing stats
+    const fi=document.getElementById('free-input');
+    fi.addEventListener('input',()=>{
+      const v=fi.value;
+      document.getElementById('free-chars').textContent=v.length;
+      document.getElementById('free-words').textContent=v.trim()?v.trim().split(/\s+/).length:0;
+      document.getElementById('free-lines').textContent=v.split('\n').length;
+    });
+
+    // Global key handler
+    document.addEventListener('keydown',e=>{
+      if(document.querySelector('#battle-screen.active')){
+        e.preventDefault();
+        this.handleKey(e);
+      }
+    });
+  },
+
+  showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if(id==='ranking-screen')this.renderRanking();
+    if(id==='free-screen')setTimeout(()=>document.getElementById('free-input').focus(),100);
+  },
+
+  startAdventure(){
+    initAudio();
+    const nameInput=document.getElementById('player-name');
+    const name=nameInput.value.trim()||'ゆうしゃ';
+    this.player.name=name;
+    this.stage=this.player.level<=2?1:this.player.level<=4?2:this.player.level<=6?3:this.player.level<=9?4:5;
+    this.stageStartTime=Date.now();
+    this.stageWords=0;this.stageChars=0;this.stageErrors=0;
+    this.wordsInStage=0;
+    this.streak=0;this.monstersDefeated=0;
+    this.spawnMonster();
+    this.showScreen('battle-screen');
+    this.updateStatsBar();
+  },
+
+  backToTitle(){
+    this.saveProgress();
+    this.showScreen('title-screen');
+  },
+
+  spawnMonster(){
+    const tier=Math.min(this.stage,5);
+    const pool=MONSTERS.filter((_,i)=>{
+      if(tier<=2)return i<3;
+      if(tier<=3)return i>=1&&i<6;
+      if(tier<=4)return i>=3&&i<9;
+      return i>=5;
+    });
+    const base=pool[Math.floor(Math.random()*pool.length)];
+    const scale=1+(this.player.level-1)*0.1;
+    this.monster={...base};
+    this.monsterMaxHp=Math.floor(base.hp*scale);
+    this.monsterHp=this.monsterMaxHp;
+    document.getElementById('m-sprite').textContent=base.sprite;
+    document.getElementById('m-sprite').className='monster-sprite';
+    document.getElementById('m-name').textContent=base.name;
+    document.getElementById('m-stage').textContent='ステージ '+this.stage+' — '+this.player.name;
+    this.updateHpBar();
+    this.nextWord();
+  },
+
+  nextWord(){
+    const tier=Math.min(this.stage,5);
+    const wordList=WORDS[tier];
+    this.word=wordList[Math.floor(Math.random()*wordList.length)];
+    this.chars=this.word.split('').map(c=>({char:c,state:'pending'}));
+    this.cursor=0;this.hasError=false;
+    this.wordStartTime=Date.now();
+    this.renderWord();
+    showNextKey(this.chars[0]?.char);
+  },
+
+  renderWord(){
+    const wd=document.getElementById('word-display');
+    wd.innerHTML=this.chars.map((c,i)=>{
+      let cls='char '+c.state;
+      if(i===this.cursor&&c.state!=='correct')cls+=' current';
+      const display=c.char===' '?'␣':c.char;
+      return `<span class="${cls}">${display}</span>`;
+    }).join('');
+  },
+
+  handleKey(e){
+    const key=e.key;
+    if(key==='Backspace'){
+      highlightKey('Backspace');
+      if(this.cursor>0&&this.chars[this.cursor-1].state==='wrong'){
+        this.cursor--;
+        this.chars[this.cursor].state='pending';
+        this.hasError=this.chars.some(c=>c.state==='wrong');
+        this.renderWord();
+        showNextKey(this.chars[this.cursor]?.char);
+        sfxType();
+      }else if(this.cursor>0&&this.hasError){
+        // find last wrong
+        for(let i=this.cursor-1;i>=0;i--){
+          if(this.chars[i].state==='wrong'){
+            this.cursor=i;
+            this.chars[i].state='pending';
+            // reset chars after this too
+            for(let j=i+1;j<this.chars.length;j++){
+              if(this.chars[j].state!=='correct')this.chars[j].state='pending';
+            }
+            this.hasError=this.chars.some(c=>c.state==='wrong');
+            this.renderWord();
+            showNextKey(this.chars[this.cursor]?.char);
+            sfxType();
+            break;
+          }
+        }
+      }
+      return;
+    }
+
+    if(key.length!==1)return;
+    if(this.cursor>=this.chars.length)return;
+
+    highlightKey(key);
+    this.stageChars++;
+
+    const expected=this.chars[this.cursor].char;
+    if(key===expected&&!this.hasError){
+      this.chars[this.cursor].state='correct';
+      this.cursor++;
+      sfxType();
+      spawnParticles(
+        cvs.width/2+(this.cursor-this.chars.length/2)*20,
+        cvs.height/2,
+        '#2ecc71',3
+      );
+
+      // Check word complete
+      if(this.cursor>=this.chars.length){
+        this.wordComplete();
+      }else{
+        showNextKey(this.chars[this.cursor]?.char);
+      }
+    }else{
+      this.chars[this.cursor].state='wrong';
+      this.hasError=true;
+      this.cursor++;
+      this.stageErrors++;
+      sfxWrong();
+      document.querySelector('.battle-area').classList.add('shake');
+      setTimeout(()=>document.querySelector('.battle-area').classList.remove('shake'),300);
+      
+      if(this.cursor<this.chars.length){
+        showNextKey(this.chars[this.cursor]?.char);
+      }
+    }
+    this.renderWord();
+  },
+
+  wordComplete(){
+    const elapsed=(Date.now()-this.wordStartTime)/1000;
+    const wpm=elapsed>0?Math.round((this.word.length/5)/(elapsed/60)):0;
+    if(wpm>this.player.bestWPM)this.player.bestWPM=wpm;
+
+    // Check if word had errors
+    const hadErrors=this.chars.some(c=>c.state==='wrong');
+    if(hadErrors){
+      // Word had errors — need backspace first
+      // Actually if we got here, all chars were typed. Reset wrong ones
+      this.streak=0;
+    }else{
+      this.streak++;
+      if(this.streak>this.player.bestStreak)this.player.bestStreak=this.streak;
+    }
+
+    this.player.wordsTyped++;
+    this.player.totalChars+=this.word.length;
+    this.stageWords++;
+    this.wordsInStage++;
+
+    // Deal damage
+    const dmg=Math.max(1,Math.floor(this.word.length*(1+this.streak*0.1)*(hadErrors?0.5:1)));
+    this.monsterHp=Math.max(0,this.monsterHp-dmg);
+    
+    sfxCorrect();
+    const sprite=document.getElementById('m-sprite');
+    sprite.className='monster-sprite hit';
+    setTimeout(()=>sprite.className='monster-sprite',300);
+    spawnParticles(cvs.width/2,cvs.height*0.3,'#e74c3c',8);
+
+    this.updateHpBar();
+    this.updateCombo(dmg,wpm);
+    this.updateStatsBar();
+
+    if(this.monsterHp<=0){
+      this.monsterDefeated();
+    }else{
+      setTimeout(()=>this.nextWord(),400);
+    }
+  },
+
+  monsterDefeated(){
+    sfxDefeat();
+    const sprite=document.getElementById('m-sprite');
+    sprite.className='monster-sprite defeated';
+    spawnExplosion(cvs.width/2,cvs.height*0.3);
+    this.monstersDefeated++;
+
+    // Grant XP
+    const xpGain=Math.floor(this.monster.xp*(1+this.player.level*0.05));
+    this.player.xp+=xpGain;
+
+    setTimeout(()=>{
+      // Check level up
+      if(this.player.xp>=this.player.xpToNext){
+        this.levelUp();
+      }else if(this.wordsInStage>=this.wordsPerStage){
+        this.stageClear();
+      }else{
+        this.spawnMonster();
+      }
+      this.updateStatsBar();
+    },900);
+  },
+
+  levelUp(){
+    this.player.xp-=this.player.xpToNext;
+    this.player.level++;
+    this.player.xpToNext=Math.floor(100*Math.pow(1.3,this.player.level-1));
+    sfxLevelUp();
+    spawnExplosion(cvs.width/2,cvs.height/2);
+    
+    document.getElementById('lu-level').textContent=this.player.level;
+    const rewards=['あたらしい ちからが みなぎる！','タイピングが はやくなった きがする！','モンスターが こわがっている！','つよさが ましていく！','でんせつの ゆうしゃに ちかづいた！'];
+    document.getElementById('lu-reward').textContent=rewards[Math.floor(Math.random()*rewards.length)];
+    
+    this.saveProgress();
+    this.showScreen('levelup-screen');
+  },
+
+  continueBattle(){
+    if(this.wordsInStage>=this.wordsPerStage){
+      this.stageClear();
+    }else{
+      this.showScreen('battle-screen');
+      this.spawnMonster();
+    }
+  },
+
+  stageClear(){
+    const elapsed=Math.floor((Date.now()-this.stageStartTime)/1000);
+    const accuracy=this.stageChars>0?Math.round(((this.stageChars-this.stageErrors)/this.stageChars)*100):100;
+    const avgWPM=elapsed>0?Math.round((this.stageChars/5)/(elapsed/60)):0;
+
+    const results=document.getElementById('stage-results');
+    results.innerHTML=`
+      <div class="result-item panel-stone"><div class="label">たおしたモンスター</div><div class="value">${this.monstersDefeated}</div></div>
+      <div class="result-item panel-stone"><div class="label">うちこんだことば</div><div class="value">${this.stageWords}</div></div>
+      <div class="result-item panel-stone"><div class="label">せいかくさ</div><div class="value">${accuracy}%</div></div>
+      <div class="result-item panel-stone"><div class="label">はやさ(WPM)</div><div class="value">${avgWPM}</div></div>
+    `;
+
+    this.saveRanking(avgWPM,accuracy);
+    this.saveProgress();
+    this.showScreen('stageclear-screen');
+  },
+
+  nextStage(){
+    this.stage=Math.min(this.stage+1,5);
+    this.stageStartTime=Date.now();
+    this.stageWords=0;this.stageChars=0;this.stageErrors=0;
+    this.wordsInStage=0;this.monstersDefeated=0;
+    this.showScreen('battle-screen');
+    this.spawnMonster();
+  },
+
+  updateHpBar(){
+    const pct=Math.max(0,(this.monsterHp/this.monsterMaxHp)*100);
+    const bar=document.getElementById('m-hp-bar');
+    bar.style.width=pct+'%';
+    bar.className='hp-bar-fill'+(pct<20?' critical':pct<50?' low':'');
+    document.getElementById('m-hp-text').textContent=this.monsterHp+' / '+this.monsterMaxHp;
+  },
+
+  updateCombo(dmg,wpm){
+    const el=document.getElementById('combo-text');
+    const wpmEl=document.getElementById('s-wpm');
+    wpmEl.textContent=wpm>0?wpm+' WPM':'';
+    
+    if(this.streak>=10){
+      el.textContent='🔥🔥🔥 ULTRA COMBO x'+this.streak+' 🔥🔥🔥  -'+dmg+'ダメージ！';
+      el.className='combo ultra';
+    }else if(this.streak>=5){
+      el.textContent='🔥 COMBO x'+this.streak+'!  -'+dmg+'ダメージ！';
+      el.className='combo fire';
+    }else if(this.streak>=3){
+      el.textContent='⚡ '+this.streak+'コンボ！ -'+dmg+'ダメージ！';
+      el.className='combo';
+    }else{
+      el.textContent='-'+dmg+'ダメージ！';
+      el.className='combo';
+    }
+  },
+
+  updateStatsBar(){
+    document.getElementById('s-level').textContent=this.player.level;
+    document.getElementById('s-streak').textContent=this.streak;
+    document.getElementById('s-words').textContent=this.player.wordsTyped;
+    const xpPct=Math.min(100,(this.player.xp/this.player.xpToNext)*100);
+    document.getElementById('s-xp-bar').style.width=xpPct+'%';
+  },
+
+  // === SAVE / LOAD ===
+  saveProgress(){
+    localStorage.setItem('tq_player',JSON.stringify(this.player));
+    localStorage.setItem('tq_stage',this.stage);
+  },
+  loadProgress(){
+    const saved=localStorage.getItem('tq_player');
+    if(saved){
+      const p=JSON.parse(saved);
+      Object.assign(this.player,p);
+    }
+    const stage=localStorage.getItem('tq_stage');
+    if(stage)this.stage=parseInt(stage);
+  },
+
+  // === RANKING ===
+  saveRanking(wpm,accuracy){
+    let rankings=JSON.parse(localStorage.getItem('tq_rankings')||'[]');
+    rankings.push({
+      name:this.player.name,
+      level:this.player.level,
+      wpm,accuracy,
+      stage:this.stage,
+      date:new Date().toLocaleDateString('ja-JP'),
+    });
+    rankings.sort((a,b)=>b.wpm-a.wpm);
+    rankings=rankings.slice(0,20);
+    localStorage.setItem('tq_rankings',JSON.stringify(rankings));
+  },
+  renderRanking(){
+    const rankings=JSON.parse(localStorage.getItem('tq_rankings')||'[]');
+    const el=document.getElementById('ranking-list');
+    if(!rankings.length){
+      el.innerHTML='<p style="font-size:11px;color:#aaa;text-align:center;font-family:\'Press Start 2P\'">まだ データが ないよ<br>ぼうけんして きろくを つくろう！</p>';
+      return;
+    }
+    const podium=['🥇','🥈','🥉'];
+    el.innerHTML=rankings.map((r,i)=>`
+      <div class="ranking-entry${r.name===this.player.name?' mine':''}">
+        <span class="rank">${i<3?podium[i]:(i+1)+'.'}</span>
+        <span class="name">${r.name} Lv.${r.level}</span>
+        <span class="score">${r.wpm} WPM (${r.accuracy}%)</span>
+      </div>
+    `).join('');
+  },
+
+  // === VISITOR COUNT (localStorage simulation) ===
+  updateVisitorCount(){
+    let count=parseInt(localStorage.getItem('tq_visits')||'0');
+    const lastVisit=localStorage.getItem('tq_lastVisit');
+    const today=new Date().toDateString();
+    if(lastVisit!==today){
+      count++;
+      localStorage.setItem('tq_visits',count);
+      localStorage.setItem('tq_lastVisit',today);
+    }
+    document.getElementById('visitor-count').textContent='🌍 おとずれた ぼうけんしゃ: '+count+' にん';
+  },
+};
+
+// === INIT ===
+Game.init();
+</script>
+</body>
+</html>
