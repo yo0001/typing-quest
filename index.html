@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>タイピングクエスト</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--red:#d03030;--green:#30a030;--blue:#3060c0;--gold:#d0a820;--correct:#30d030;--wrong:#d03030;--cursor:#d0a820;--txt:#d8d8d0;--dark:#0a0a12}
 html,body{width:100%;height:100%;overflow:hidden;touch-action:manipulation}
-body{font-family:'Press Start 2P',monospace;image-rendering:pixelated;image-rendering:crisp-edges;-webkit-font-smoothing:none;-moz-osx-font-smoothing:unset;font-smooth:never;color:var(--txt);display:flex;align-items:center;justify-content:center;background:var(--dark)}
+body{font-family:'Press Start 2P','DotGothic16',monospace;image-rendering:pixelated;image-rendering:crisp-edges;-webkit-font-smoothing:none;-moz-osx-font-smoothing:unset;font-smooth:never;color:var(--txt);display:flex;align-items:center;justify-content:center;background:var(--dark)}
 canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;image-rendering:pixelated;image-rendering:crisp-edges}
 canvas#fx{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:100;image-rendering:pixelated}
 .screen{display:none;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:760px;padding:14px;text-align:center;z-index:1;position:relative}
@@ -18,12 +18,12 @@ canvas#fx{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none
 h1{font-size:24px;color:var(--gold);text-shadow:2px 2px 0 #000;margin-bottom:4px;line-height:1.6;letter-spacing:2px}
 h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 .subtitle{font-size:8px;color:#808080;margin-bottom:14px}
-.btn{font-family:'Press Start 2P',monospace;font-size:12px;padding:12px 24px;margin:5px;cursor:pointer;border:3px solid #f0f0e0;background:var(--blue);color:#f0f0e0;text-shadow:1px 1px 0 #000;box-shadow:inset -2px -2px 0 #1a3070,inset 2px 2px 0 #5080e0;outline:none}
+.btn{font-family:'Press Start 2P','DotGothic16',monospace;font-size:12px;padding:12px 24px;margin:5px;cursor:pointer;border:3px solid #f0f0e0;background:var(--blue);color:#f0f0e0;text-shadow:1px 1px 0 #000;box-shadow:inset -2px -2px 0 #1a3070,inset 2px 2px 0 #5080e0;outline:none}
 .btn:active{box-shadow:inset 2px 2px 0 #1a3070,inset -2px -2px 0 #5080e0}
 .btn-red{background:var(--red);box-shadow:inset -2px -2px 0 #701818,inset 2px 2px 0 #e05050}
 .btn-green{background:var(--green);box-shadow:inset -2px -2px 0 #186018,inset 2px 2px 0 #50c050}
 .btn-small{font-size:8px;padding:8px 12px}
-.name-input{font-family:'Press Start 2P',monospace;font-size:16px;padding:10px 14px;background:#000010;border:3px solid var(--gold);color:var(--gold);text-align:center;width:240px;outline:none;margin:8px 0;box-shadow:inset 2px 2px 0 #000}
+.name-input{font-family:'Press Start 2P','DotGothic16',monospace;font-size:16px;padding:10px 14px;background:#000010;border:3px solid var(--gold);color:var(--gold);text-align:center;width:240px;outline:none;margin:8px 0;box-shadow:inset 2px 2px 0 #000}
 .name-input::placeholder{color:rgba(208,168,32,0.25)}.name-input:focus{border-color:#e8c840}
 /* Pixel icon inline */
 .pxi{display:inline-block;vertical-align:middle;image-rendering:pixelated;image-rendering:crisp-edges}
@@ -74,7 +74,7 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 .rank-entry{display:flex;justify-content:space-between;padding:5px 8px;border-bottom:1px solid #181828;font-size:8px}
 .rank-entry.mine{background:rgba(208,168,32,.08);border:1px solid var(--gold)}
 .rank-entry .rank{color:var(--gold);min-width:26px}.rank-entry .rname{flex:1;margin:0 8px}.rank-entry .rscore{color:var(--green)}
-.free-input{font-family:'Press Start 2P',monospace;font-size:10px;width:100%;padding:10px;background:#000010;border:2px solid #404058;color:var(--txt);resize:none;height:100px;outline:none}
+.free-input{font-family:'Press Start 2P','DotGothic16',monospace;font-size:10px;width:100%;padding:10px;background:#000010;border:2px solid #404058;color:var(--txt);resize:none;height:100px;outline:none}
 .free-input:focus{border-color:var(--gold)}
 .free-stats{display:flex;gap:14px;justify-content:center;margin-top:5px;font-size:8px;color:#606070}
 .visitor-count{font-size:8px;color:#383848;margin-top:10px}
@@ -282,7 +282,7 @@ const Game={
   p:{name:'',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0},
   stage:1,mon:null,mHp:0,mMax:0,mD:0,
   word:'',chars:[],cur:0,hasErr:false,
-  streak:0,wS:0,sS:0,sW:0,sC:0,sE:0,wIS:0,wPS:10,mBuf:'',
+  streak:0,wS:0,sS:0,sW:0,sC:0,sE:0,wIS:0,wPS:10,mBuf:'',composing:false,
 
   init(){
     this.load();document.getElementById('player-name').value=this.p.name;
@@ -290,7 +290,7 @@ const Game={
     document.getElementById('player-name').addEventListener('keydown',e=>{if(e.key==='Enter')this.startAdventure()});
     document.getElementById('free-input').addEventListener('input',function(){document.getElementById('free-chars').textContent=this.value.length;document.getElementById('free-words').textContent=this.value.trim()?this.value.trim().split(/\s+/).length:0});
     document.addEventListener('keydown',e=>{if(!isMobile&&document.querySelector('#battle-screen.active')){e.preventDefault();this.handleKeyPC(e)}});
-    if(isMobile){mI.addEventListener('input',e=>this.handleMI(e));mI.addEventListener('keydown',e=>{if(e.key==='Backspace')this.handleBS()});document.getElementById('battle-screen').addEventListener('touchstart',()=>this.focusMobile())}
+    if(isMobile){mI.addEventListener('compositionstart',()=>{this.composing=true});mI.addEventListener('compositionend',e=>{this.composing=false;const t=e.data||'';for(const ch of t)if(this.cur<this.chars.length)this.processC(ch);setTimeout(()=>{mI.value='';this.mBuf=''},0)});mI.addEventListener('input',e=>{if(this.composing||e.isComposing)return;this.handleMI(e)});mI.addEventListener('keydown',e=>{if(e.key==='Backspace')this.handleBS()});document.getElementById('battle-screen').addEventListener('touchstart',()=>this.focusMobile())}
   },
 
   focusMobile(){const s=this.stage;if(s===1||s>=4){mI.setAttribute('inputmode','latin');mI.setAttribute('lang','en')}else{mI.removeAttribute('inputmode');mI.setAttribute('lang','ja')}mI.value='';this.mBuf='';mI.focus()},
