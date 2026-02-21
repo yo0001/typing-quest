@@ -118,6 +118,24 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 .screen-shake{animation:screenShake .4s steps(4)}
 @keyframes screenShake{0%,100%{transform:translate(0)}20%{transform:translate(-8px,4px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,6px)}80%{transform:translate(4px,-2px)}}
 @media(max-width:600px){.skill-name{font-size:16px}.skill-dmg{font-size:28px}}
+/* === MONSTER ATTACK SYSTEM === */
+.atk-wrap{width:60%;max-width:260px;margin:2px auto 4px;position:relative}
+.atk-outer{height:6px;background:#181828;border:2px solid #383848;overflow:hidden}
+.atk-inner{height:100%;width:0%;background:#d0a820;transition:width .1s linear}
+.atk-inner.warn{background:#d07020}
+.atk-inner.danger{background:#d03030;animation:blink8 .2s steps(1) infinite}
+.atk-label{font-size:5px;color:#484858;text-align:center;margin-top:1px}
+.php-item{display:flex;align-items:center;gap:3px}
+.php-txt{font-size:7px;color:#30a030}
+.php-txt.low{color:#c07020}
+.php-txt.crit{color:#d03030;animation:blink8 .3s steps(1) infinite}
+.dmg-flash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:150;pointer-events:none}
+.dmg-flash.active{animation:dmgFlash .3s steps(3) forwards}
+@keyframes dmgFlash{0%{background:rgba(208,48,48,0.4)}50%{background:rgba(208,48,48,0.2)}100%{background:transparent}}
+.gameover-title{font-size:24px;color:#d03030;text-shadow:3px 3px 0 #000;letter-spacing:4px;margin-bottom:8px}
+.gameover-sub{font-size:8px;color:#808080;margin:4px 0 10px}
+#battle-screen.kb-open .atk-wrap{margin:0 auto 1px}
+#battle-screen.kb-open .atk-label{display:none}
 </style>
 </head>
 <body>
@@ -125,6 +143,7 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 <canvas id="fx"></canvas>
 <div class="scanlines"></div>
 <div class="skill-overlay" id="skill-overlay"></div>
+<div class="dmg-flash" id="dmg-flash"></div>
 <input type="text" id="mobile-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
 
 <!-- TITLE -->
@@ -152,6 +171,7 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
     <div class="stat-item"><canvas class="pxi" data-icon="fire" width="8" height="8" style="width:12px;height:12px"></canvas><span class="stat-value" id="s-streak">0</span></div>
     <div class="stat-item"><canvas class="pxi" data-icon="sword_sm" width="8" height="8" style="width:12px;height:12px"></canvas><span class="stat-value" id="s-words">0</span></div>
     <div class="stat-item wpm-display" id="s-wpm"></div>
+    <div class="stat-item php-item"><canvas class="pxi" data-icon="heart" width="8" height="8" style="width:12px;height:12px"></canvas><span class="php-txt" id="s-php">100</span></div>
   </div>
   <div class="mon-stage" id="m-stage">STAGE 1</div>
   <canvas class="mon-canvas" id="m-canvas" width="16" height="16"></canvas>
@@ -159,6 +179,10 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
   <div class="hp-wrap">
     <div class="hp-txt" id="m-hp-txt">HP 30/30</div>
     <div class="hp-outer"><div class="hp-inner" id="m-hp" style="width:100%"></div></div>
+  </div>
+  <div class="atk-wrap">
+    <div class="atk-outer"><div class="atk-inner" id="m-atk" style="width:0%"></div></div>
+    <div class="atk-label">てきの こうげき</div>
   </div>
   <div class="panel" style="padding:10px">
     <div class="combo" id="combo-text"></div>
@@ -191,6 +215,17 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
   </div>
 </div>
 
+
+<!-- GAME OVER -->
+<div id="gameover-screen" class="screen">
+  <div class="panel" style="max-width:410px">
+    <div class="gameover-title">GAME OVER</div>
+    <div class="gameover-sub">ゆうしゃは たおれた...</div>
+    <div class="result-grid" id="gameover-results"></div>
+    <button class="btn btn-green" onclick="Game.retryBattle()">もう いちど</button>
+    <button class="btn btn-small" onclick="Game.backToTitle()">タイトルへ</button>
+  </div>
+</div>
 <!-- FREE TYPING -->
 <div id="free-screen" class="screen">
   <div class="panel" style="max-width:460px">
@@ -329,7 +364,7 @@ function showNext(c){document.querySelectorAll('.kb-key').forEach(k=>k.classList
 const mI=document.getElementById('mobile-input');
 const Game={
   p:{name:'',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0},
-  stage:1,mon:null,mHp:0,mMax:0,mD:0,
+  stage:1,mon:null,mHp:0,mMax:0,mD:0,pHp:100,pMaxHp:100,atkT:0,atkMax:20,atkDmg:5,atkInt:null,
   word:'',chars:[],cur:0,hasErr:false,
   streak:0,wS:0,sS:0,sW:0,sC:0,sE:0,wIS:0,wPS:10,mBuf:'',composing:false,mOffset:0,wBag:[],wBagS:0,
 
@@ -347,13 +382,13 @@ const Game={
 
   showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='ranking-screen')this.renderR();if(id==='free-screen')setTimeout(()=>document.getElementById('free-input').focus(),50)},
 
-  startAdventure(){initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=7?3:this.p.level<=10?4:5;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;if(isMobile){mI.value='';this.mOffset=0}this.spawnM();this.showScreen('battle-screen');this.updateS();if(isMobile)setTimeout(()=>this.focusMobile(),200)},
+  startAdventure(){initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=7?3:this.p.level<=10?4:5;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;this.pMaxHp=80+this.p.level*10;this.pHp=this.pMaxHp;if(isMobile){mI.value='';this.mOffset=0}this.spawnM();this.showScreen('battle-screen');this.updateS();this.updatePHP();this.startAtkTimer();if(isMobile)setTimeout(()=>this.focusMobile(),200)},
 
-  backToTitle(){this.save();this.showScreen('title-screen')},
+  backToTitle(){this.stopAtkTimer();this.save();this.showScreen('title-screen')},
 
-  spawnM(){const pool=MONS[Math.min(this.stage,5)-1];const base=pool[Math.floor(Math.random()*pool.length)];const sc=1+(this.p.level-1)*.08;this.mon={...base};this.mMax=Math.floor(base.hp*sc);this.mHp=this.mMax;const cv=document.getElementById('m-canvas');cv.className='mon-canvas';drawMon(cv,base.key);document.getElementById('m-name').textContent=base.name;document.getElementById('m-stage').textContent='STAGE '+this.stage+' - '+this.p.name;document.getElementById('stage-desc').textContent='> '+getD(this.stage);document.getElementById('typing-hint').textContent=isMobile?'うえの もじを そのまま うってね':'キーボードで うちこもう! BS でけせるよ';this.updateHP();this.nextW()},
+  spawnM(){const pool=MONS[Math.min(this.stage,5)-1];const base=pool[Math.floor(Math.random()*pool.length)];const sc=1+(this.p.level-1)*.08;this.mon={...base};this.mMax=Math.floor(base.hp*sc);this.mHp=this.mMax;const cv=document.getElementById('m-canvas');cv.className='mon-canvas';drawMon(cv,base.key);document.getElementById('m-name').textContent=base.name;document.getElementById('m-stage').textContent='STAGE '+this.stage+' - '+this.p.name;document.getElementById('stage-desc').textContent='> '+getD(this.stage);document.getElementById('typing-hint').textContent=isMobile?'うえの もじを そのまま うってね':'キーボードで うちこもう! BS でけせるよ';this.updateHP();const ac=ATK_CFG[Math.min(this.stage,5)-1];this.atkMax=ac.time;this.atkDmg=ac.dmg;this.nextW()},
 
-  nextW(){const wl=getW(this.stage);if(this.wBagS!==this.stage||this.wBag.length===0){this.wBag=[...wl].sort(()=>Math.random()-.5);this.wBagS=this.stage}if(this.wBag.length===0)this.wBag=[...wl].sort(()=>Math.random()-.5);this.word=this.wBag.pop();this.chars=this.word.split('').map(c=>({c,s:'pending'}));this.cur=0;this.hasErr=false;this.wS=Date.now();if(isMobile){this.mDL=0}this.renderW();if(!isMobile)showNext(this.chars[0]?.c)},
+  nextW(){const wl=getW(this.stage);if(this.wBagS!==this.stage||this.wBag.length===0){this.wBag=[...wl].sort(()=>Math.random()-.5);this.wBagS=this.stage}if(this.wBag.length===0)this.wBag=[...wl].sort(()=>Math.random()-.5);this.word=this.wBag.pop();this.chars=this.word.split('').map(c=>({c,s:'pending'}));this.cur=0;this.hasErr=false;this.wS=Date.now();if(isMobile){this.mDL=0}this.renderW();if(!isMobile)showNext(this.chars[0]?.c);this.resetAtk()},
 
   renderW(){document.getElementById('word-display').innerHTML=this.chars.map((ch,i)=>{let cls='char '+ch.s;if(i===this.cur&&ch.s!=='correct')cls+=' current';return`<span class="${cls}">${ch.c===' '?'_':ch.c}</span>`}).join('')},
 
@@ -369,24 +404,33 @@ const Game={
 
   processC(key){this.sC++;const exp=this.chars[this.cur].c;if(key===exp&&!this.hasErr){this.chars[this.cur].s='correct';this.cur++;sfxType();spawnP(window.innerWidth/2,window.innerHeight*.5,'#30d030',3);if(this.cur>=this.chars.length)this.wordDone();else{this.renderW();if(!isMobile)showNext(this.chars[this.cur]?.c);return}}else{this.chars[this.cur].s='wrong';this.hasErr=true;this.cur++;this.sE++;sfxBad();document.querySelector('#battle-screen .panel')?.classList.add('shake');setTimeout(()=>document.querySelector('#battle-screen .panel')?.classList.remove('shake'),150);if(this.cur<this.chars.length&&!isMobile)showNext(this.chars[this.cur]?.c)}this.renderW()},
 
-  wordDone(){const el=(Date.now()-this.wS)/1000;const wpm=el>0?Math.round((this.word.length/5)/(el/60)):0;if(wpm>this.p.bW)this.p.bW=wpm;const bad=this.chars.some(c=>c.s==='wrong');if(bad)this.streak=0;else{this.streak++;if(this.streak>this.p.bS)this.p.bS=this.streak}this.p.wt++;this.p.tc+=this.word.length;this.sW++;this.wIS++;const dmg=Math.max(1,Math.floor(this.word.length*(1+this.streak*.15)*(bad?.5:1)));this.mHp=Math.max(0,this.mHp-dmg);sfxOk();const cv=document.getElementById('m-canvas');cv.classList.add('hit');setTimeout(()=>cv.classList.remove('hit'),150);spawnP(window.innerWidth/2,window.innerHeight*.25,'#d03030',5);this.updateHP();this.updateCmb(dmg,wpm);this.updateS();const sk=SKILLS.find(s=>this.streak===s.combo);if(sk){this.triggerSkill(sk,dmg)}else if(this.mHp<=0)this.monK();else setTimeout(()=>{this.nextW();if(isMobile)this.focusMobile()},300)},
+  wordDone(){this.resetAtk();const el=(Date.now()-this.wS)/1000;const wpm=el>0?Math.round((this.word.length/5)/(el/60)):0;if(wpm>this.p.bW)this.p.bW=wpm;const bad=this.chars.some(c=>c.s==='wrong');if(bad)this.streak=0;else{this.streak++;if(this.streak>this.p.bS)this.p.bS=this.streak}this.p.wt++;this.p.tc+=this.word.length;this.sW++;this.wIS++;const dmg=Math.max(1,Math.floor(this.word.length*(1+this.streak*.15)*(bad?.5:1)));this.mHp=Math.max(0,this.mHp-dmg);sfxOk();const cv=document.getElementById('m-canvas');cv.classList.add('hit');setTimeout(()=>cv.classList.remove('hit'),150);spawnP(window.innerWidth/2,window.innerHeight*.25,'#d03030',5);this.updateHP();this.updateCmb(dmg,wpm);this.updateS();const sk=SKILLS.find(s=>this.streak===s.combo);if(sk){this.triggerSkill(sk,dmg)}else if(this.mHp<=0)this.monK();else setTimeout(()=>{this.nextW();if(isMobile)this.focusMobile()},300)},
 
-  triggerSkill(sk,baseDmg){const bonusDmg=Math.floor(baseDmg*(sk.mult-1));sfxSkill(sk);const ov=document.getElementById('skill-overlay');ov.innerHTML='<div class="skill-flash" style="--sk-c:'+sk.color+'"></div><div class="skill-label">ひっさつわざ</div><div class="skill-name" style="--sk-c:'+sk.color+'">'+sk.name+'</div><div class="skill-dmg" id="skill-dmg-live"></div>';ov.classList.remove('active');ov.offsetHeight;ov.classList.add('active');document.body.classList.add('screen-shake');setTimeout(()=>document.body.classList.remove('screen-shake'),400);for(let i=0;i<40;i++){spawnP(Math.random()*window.innerWidth,Math.random()*window.innerHeight*.6,sk.pc[i%sk.pc.length],2)}setTimeout(()=>{this.mHp=Math.max(0,this.mHp-bonusDmg);this.updateHP();const dd=document.getElementById('skill-dmg-live');if(dd)dd.textContent='-'+bonusDmg;spawnBoom(window.innerWidth/2,window.innerHeight*.3);const cv=document.getElementById('m-canvas');cv.classList.add('hit');setTimeout(()=>cv.classList.remove('hit'),150)},600);setTimeout(()=>{ov.classList.remove('active');if(this.mHp<=0)this.monK();else setTimeout(()=>{this.nextW();if(isMobile)this.focusMobile()},200)},1400)},
+  triggerSkill(sk,baseDmg){this.stopAtkTimer();const bonusDmg=Math.floor(baseDmg*(sk.mult-1));sfxSkill(sk);const ov=document.getElementById('skill-overlay');ov.innerHTML='<div class="skill-flash" style="--sk-c:'+sk.color+'"></div><div class="skill-label">ひっさつわざ</div><div class="skill-name" style="--sk-c:'+sk.color+'">'+sk.name+'</div><div class="skill-dmg" id="skill-dmg-live"></div>';ov.classList.remove('active');ov.offsetHeight;ov.classList.add('active');document.body.classList.add('screen-shake');setTimeout(()=>document.body.classList.remove('screen-shake'),400);for(let i=0;i<40;i++){spawnP(Math.random()*window.innerWidth,Math.random()*window.innerHeight*.6,sk.pc[i%sk.pc.length],2)}setTimeout(()=>{this.mHp=Math.max(0,this.mHp-bonusDmg);this.updateHP();const dd=document.getElementById('skill-dmg-live');if(dd)dd.textContent='-'+bonusDmg;spawnBoom(window.innerWidth/2,window.innerHeight*.3);const cv=document.getElementById('m-canvas');cv.classList.add('hit');setTimeout(()=>cv.classList.remove('hit'),150)},600);setTimeout(()=>{ov.classList.remove('active');this.startAtkTimer();if(this.mHp<=0)this.monK();else setTimeout(()=>{this.nextW();if(isMobile)this.focusMobile()},200)},1400)},
 
-  monK(){sfxKill();document.getElementById('m-canvas').classList.add('dead');spawnBoom(window.innerWidth/2,window.innerHeight*.25);this.mD++;this.p.xp+=Math.floor(this.mon.xp*(1+this.p.level*.04));setTimeout(()=>{if(this.p.xp>=this.p.xpN)this.lvlUp();else if(this.wIS>=this.wPS)this.stageClear();else{this.spawnM();if(isMobile)this.focusMobile()}this.updateS()},600)},
+  monK(){sfxKill();this.pHp=Math.min(this.pMaxHp,this.pHp+15);this.updatePHP();document.getElementById('m-canvas').classList.add('dead');spawnBoom(window.innerWidth/2,window.innerHeight*.25);this.mD++;this.p.xp+=Math.floor(this.mon.xp*(1+this.p.level*.04));setTimeout(()=>{if(this.p.xp>=this.p.xpN)this.lvlUp();else if(this.wIS>=this.wPS)this.stageClear();else{this.spawnM();if(isMobile)this.focusMobile()}this.updateS()},600)},
 
-  lvlUp(){this.p.xp-=this.p.xpN;this.p.level++;this.p.xpN=Math.floor(60*Math.pow(1.25,this.p.level-1));sfxLvl();spawnBoom(window.innerWidth/2,window.innerHeight/2);document.getElementById('lu-level').textContent=this.p.level;const rw=['ちからが みなぎる!','タイピングが はやくなった!','てきが おそれている!','つよさが ました!','でんせつに ちかづいた!'];document.getElementById('lu-reward').textContent=rw[Math.floor(Math.random()*rw.length)];this.save();this.showScreen('levelup-screen')},
+  lvlUp(){this.stopAtkTimer();this.p.xp-=this.p.xpN;this.pMaxHp=80+this.p.level*10;this.pHp=Math.min(this.pMaxHp,this.pHp+20);this.p.level++;this.p.xpN=Math.floor(60*Math.pow(1.25,this.p.level-1));sfxLvl();spawnBoom(window.innerWidth/2,window.innerHeight/2);document.getElementById('lu-level').textContent=this.p.level;const rw=['ちからが みなぎる!','タイピングが はやくなった!','てきが おそれている!','つよさが ました!','でんせつに ちかづいた!'];document.getElementById('lu-reward').textContent=rw[Math.floor(Math.random()*rw.length)];this.save();this.showScreen('levelup-screen')},
 
-  continueBattle(){if(this.wIS>=this.wPS)this.stageClear();else{this.showScreen('battle-screen');this.spawnM();if(isMobile)setTimeout(()=>this.focusMobile(),200)}},
+  continueBattle(){if(this.wIS>=this.wPS)this.stageClear();else{this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();if(isMobile)setTimeout(()=>this.focusMobile(),200)}},
 
-  stageClear(){const t=Math.floor((Date.now()-this.sS)/1000);const acc=this.sC>0?Math.round(((this.sC-this.sE)/this.sC)*100):100;const wpm=t>0?Math.round((this.sC/5)/(t/60)):0;document.getElementById('stage-results').innerHTML=`<div class="result-item"><div class="label">たおした てき</div><div class="value">${this.mD}</div></div><div class="result-item"><div class="label">うった ことば</div><div class="value">${this.sW}</div></div><div class="result-item"><div class="label">せいかくさ</div><div class="value">${acc}%</div></div><div class="result-item"><div class="label">WPM</div><div class="value">${wpm}</div></div>`;this.saveR(wpm,acc);this.save();this.showScreen('stageclear-screen')},
+  stageClear(){this.stopAtkTimer();this.pHp=this.pMaxHp;this.updatePHP();const t=Math.floor((Date.now()-this.sS)/1000);const acc=this.sC>0?Math.round(((this.sC-this.sE)/this.sC)*100):100;const wpm=t>0?Math.round((this.sC/5)/(t/60)):0;document.getElementById('stage-results').innerHTML=`<div class="result-item"><div class="label">たおした てき</div><div class="value">${this.mD}</div></div><div class="result-item"><div class="label">うった ことば</div><div class="value">${this.sW}</div></div><div class="result-item"><div class="label">せいかくさ</div><div class="value">${acc}%</div></div><div class="result-item"><div class="label">WPM</div><div class="value">${wpm}</div></div>`;this.saveR(wpm,acc);this.save();this.showScreen('stageclear-screen')},
 
-  nextStage(){this.stage=Math.min(this.stage+1,5);this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.mD=0;if(isMobile){mI.value='';this.mOffset=0}this.showScreen('battle-screen');this.spawnM();if(isMobile)setTimeout(()=>this.focusMobile(),200)},
+  nextStage(){this.pHp=this.pMaxHp;this.updatePHP();this.stage=Math.min(this.stage+1,5);this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.mD=0;if(isMobile){mI.value='';this.mOffset=0}this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();if(isMobile)setTimeout(()=>this.focusMobile(),200)},
 
   updateHP(){const p=Math.max(0,(this.mHp/this.mMax)*100);const b=document.getElementById('m-hp');b.style.width=p+'%';b.className='hp-inner'+(p<15?' crit':p<35?' low':'');document.getElementById('m-hp-txt').textContent='HP '+this.mHp+'/'+this.mMax},
   updateCmb(d,w){const el=document.getElementById('combo-text');document.getElementById('s-wpm').textContent=w>0?w+'WPM':'';if(this.streak>=10){el.textContent='** ULTRA x'+this.streak+' -'+d;el.className='combo ultra'}else if(this.streak>=5){el.textContent='* COMBO x'+this.streak+' -'+d;el.className='combo fire'}else if(this.streak>=3){el.textContent=this.streak+'COMBO -'+d;el.className='combo'}else{el.textContent='-'+d+' DAMAGE';el.className='combo'}},
   updateS(){document.getElementById('s-level').textContent=this.p.level;document.getElementById('s-streak').textContent=this.streak;document.getElementById('s-words').textContent=this.p.wt;document.getElementById('s-xp').style.width=Math.min(100,(this.p.xp/this.p.xpN)*100)+'%'},
 
+  startAtkTimer(){this.stopAtkTimer();this.atkT=0;this.atkInt=setInterval(()=>{if(!document.querySelector('#battle-screen.active'))return;this.atkT+=0.1;this.updateAtkBar();if(this.atkT>=this.atkMax){this.resetAtk();this.monAttack()}},100)},
+  stopAtkTimer(){if(this.atkInt){clearInterval(this.atkInt);this.atkInt=null}},
+  resetAtk(){this.atkT=0;this.updateAtkBar()},
+  updateAtkBar(){const p=Math.min(100,(this.atkT/this.atkMax)*100);const bar=document.getElementById('m-atk');if(!bar)return;bar.style.width=p+'%';bar.className='atk-inner'+(p>80?' danger':p>50?' warn':'')},
+  monAttack(){if(this.pHp<=0)return;sfxHit();this.playerDmg(this.atkDmg);const cv=document.getElementById('m-canvas');cv.style.transform='translateY(8px)';setTimeout(()=>{cv.style.transform=''},150)},
+  playerDmg(amt){this.pHp=Math.max(0,this.pHp-amt);this.updatePHP();const fl=document.getElementById('dmg-flash');fl.classList.remove('active');fl.offsetHeight;fl.classList.add('active');setTimeout(()=>fl.classList.remove('active'),300);document.body.classList.add('screen-shake');setTimeout(()=>document.body.classList.remove('screen-shake'),400);spawnP(window.innerWidth/2,window.innerHeight*.7,'#d03030',8);if(this.pHp<=0){this.gameOver()}},
+  updatePHP(){const el=document.getElementById('s-php');if(!el)return;el.textContent=this.pHp;const pct=this.pHp/this.pMaxHp;el.className='php-txt'+(pct<0.15?' crit':pct<0.35?' low':'')},
+  gameOver(){this.stopAtkTimer();sfxBad();setTimeout(()=>sfxBad(),100);setTimeout(()=>snd(80,.3,'sawtooth'),200);const acc=this.sC>0?Math.round(((this.sC-this.sE)/this.sC)*100):100;document.getElementById('gameover-results').innerHTML='<div class="result-item"><div class="label">STAGE</div><div class="value">'+this.stage+'</div></div><div class="result-item"><div class="label">たおした てき</div><div class="value">'+this.mD+'</div></div><div class="result-item"><div class="label">うった ことば</div><div class="value">'+this.sW+'</div></div><div class="result-item"><div class="label">せいかくさ</div><div class="value">'+acc+'%</div></div>';this.save();this.showScreen('gameover-screen')},
+  retryBattle(){this.pHp=this.pMaxHp;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;if(isMobile){mI.value='';this.mOffset=0}this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();this.updatePHP();this.updateS();if(isMobile)setTimeout(()=>this.focusMobile(),200)},
   save(){localStorage.setItem('tq_p',JSON.stringify(this.p));localStorage.setItem('tq_s',this.stage)},
   load(){const s=localStorage.getItem('tq_p');if(s)Object.assign(this.p,JSON.parse(s));const t=localStorage.getItem('tq_s');if(t)this.stage=parseInt(t)},
   saveR(w,a){let r=JSON.parse(localStorage.getItem('tq_r')||'[]');r.push({n:this.p.name,l:this.p.level,w,a,s:this.stage,d:new Date().toLocaleDateString('ja-JP')});r.sort((a,b)=>b.w-a.w);r=r.slice(0,20);localStorage.setItem('tq_r',JSON.stringify(r))},
