@@ -185,8 +185,8 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 .potion-btn{font-family:'Press Start 2P','DotGothic16',monospace;font-size:7px;padding:4px 8px;cursor:pointer;border:2px solid var(--green);background:#103010;color:var(--green);margin-left:4px}
 .potion-btn:active{background:#205020}
 .potion-btn.empty{opacity:.3;cursor:default;border-color:#303048;color:#303048}
-.avatar-preview{image-rendering:pixelated;image-rendering:crisp-edges;width:80px;height:80px;margin:6px auto;border:3px solid #484858;background:#000010}
-.avatar-mini{image-rendering:pixelated;image-rendering:crisp-edges;width:28px;height:28px}
+.avatar-preview{image-rendering:pixelated;image-rendering:crisp-edges;width:96px;height:96px;margin:6px auto;border:3px solid #484858;background:#000010}
+.avatar-mini{image-rendering:pixelated;image-rendering:crisp-edges;width:40px;height:40px}
 .avatar-battle{display:flex;align-items:center;justify-content:center;gap:16px;margin:2px 0}
 .vs-label{font-size:10px;color:var(--red);text-shadow:1px 1px 0 #000}
 #battle-screen.kb-open .avatar-battle{display:none}
@@ -442,6 +442,14 @@ const PM={
   golem:{c:['','#808088','#606068','#404048','#d0a820','#a0a0a0'],d:['0000111100000000','0001111110000000','0011111111000000','0011141411000000','0011111111000000','0001111110000000','0011111111000000','0111111111100000','1111111111110000','0111111111100000','0011111111000000','0011111111000000','0011100111000000','0011100111000000','0000000000000000','0000000000000000']},
   scorpion:{c:['','#c03020','#a02818','#701810','#d0a820','#101010'],d:['0000000001000000','0000000010100000','0000000101000000','0000001110000000','0011111100000000','0111111110000000','0111141110000000','0111111110000000','0111111110000000','0011111100000000','1001101001000000','1001101001000000','0000000000000000','0000000000000000','0000000000000000','0000000000000000']},
   wizard:{c:['','#7030b0','#5020a0','#381880','#d0a820','#d8c8b0','#101010','#3060c0'],d:['0000010000000000','0000111000000000','0001111100000000','0001414100000000','0000555000000000','0000565000000000','0000555000000000','0001111100000000','0011111110000000','0011711110000000','0011111110000000','0001111100000000','0000111000000000','0000101000000000','0000000000000000','0000000000000000']},
+  harpy:{c:['','#a050c0','#8038a0','#603080','#d8b090','#101010','#e0d0f0'],d:['0000000000000000','0000044000000000','0000444400000000','0000454400000000','0000444400000000','0000044000000000','1110011001110000','1122222221110000','0112222211000000','0012222210000000','0001111100000000','0000121000000000','0001000100000000','0000000000000000','0000000000000000','0000000000000000']},
+  yeti:{c:['','#e0e8f0','#c0d0e0','#a0b0c8','#4060a0','#101010','#d8d8e0'],d:['0100000001000000','0110111101100000','0011111111000000','0011141411000000','0011151511000000','0011666611000000','0001111110000000','0011111111000000','1111111111100000','0111111111000000','0011111110000000','0001111100000000','0001100110000000','0003300330000000','0000000000000000','0000000000000000']},
+  darkKnight:{c:['','#303850','#202838','#181828','#c03030','#d0a820','#808898'],d:['0000555000000000','0005555500000000','0001111100000000','0011141110000000','0011111110000000','0001111100000000','0006666600000000','0061111160000000','0611111116000000','0061111160000000','0006666600000000','0001111100000000','0001100110000000','0003300330000000','0000000000000000','0000000000000000']},
+  kraken:{c:['','#2060a0','#184888','#103870','#30a0c0','#101010','#40c0e0'],d:['0000000000000000','0000011100000000','0001144110000000','0011455411000000','0011111111000000','0011111111000000','0001111110000000','0010111010100000','0101010101010000','1010101010100000','0101010101000000','1010000010100000','0100000001000000','0000000000000000','0000000000000000','0000000000000000']},
+  phoenix:{c:['','#d05020','#e08030','#f0c040','#f0e060','#a03010','#101010'],d:['0000030000000000','0000343000000000','0003434300000000','0003414300000000','0003414300000000','0002343200000000','0112222211000000','1222222222100000','0122222221000000','0012222210000000','0001212100000000','0000121000000000','0000111000000000','0001000100000000','0000000000000000','0000000000000000']},
+  lich:{c:['','#40a060','#308048','#206030','#d8d0b0','#a030d0','#101010','#d03030'],d:['0000555000000000','0005555500000000','0004444400000000','0004747400000000','0004444400000000','0000444000000000','0005555500000000','0051111500000000','0511111150000000','0051111500000000','0005555000000000','0000111000000000','0000101000000000','0000303000000000','0000000000000000','0000000000000000']},
+  hydra:{c:['','#30a060','#209048','#186830','#d03030','#101010','#f0e060'],d:['0100010001000000','1110011101110000','1161016101610000','0112011201120000','0011111111000000','0001111110000000','0001111110000000','0011111111000000','0011111111000000','0001111110000000','0000111100000000','0000111000000000','0001000100000000','0003000300000000','0000000000000000','0000000000000000']},
+  shinryu:{c:['','#d0a820','#b09018','#907010','#f0e868','#101010','#f0d040','#f06040'],d:['0010000000100000','0110000001100000','1114111141100000','0144444444100000','0144242441100000','0144454451100000','0014444441000000','0001477710000000','0011111111001000','1011111111011000','0011111111001000','0011111110000000','0010110101000000','0030330303000000','0000000000000000','0000000000000000']},
 };
 function drawMon(cv,key){const m=PM[key];if(!m)return;const c=cv.getContext('2d');c.clearRect(0,0,16,16);for(let y=0;y<16;y++)for(let x=0;x<16;x++){const i=parseInt(m.d[y][x]);if(i>0&&m.c[i]){c.fillStyle=m.c[i];c.fillRect(x,y,1,1)}}}
 
@@ -462,40 +470,152 @@ function sfxSkill(sk){sk.notes.forEach((f,i)=>setTimeout(()=>snd(f,.15,'triangle
 function sfxHit(){snd(120,.15,'sawtooth');setTimeout(()=>snd(90,.1,'sawtooth'),60)}
 
 /* ===== ATTACK CONFIG (per stage: time=seconds to charge, dmg=damage per hit) ===== */
-const ATK_CFG=[{time:15,dmg:8},{time:12,dmg:12},{time:10,dmg:16},{time:8,dmg:22},{time:6,dmg:30}];
+const ATK_CFG=[{time:15,dmg:8},{time:13,dmg:12},{time:11,dmg:16},{time:9,dmg:22},{time:7,dmg:30},{time:6,dmg:38},{time:5.5,dmg:46},{time:5,dmg:55},{time:4.5,dmg:65},{time:4,dmg:80}];
 
 function sfxBuy(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>snd(f,.08,'triangle'),i*50))}
 function sfxPotion(){snd(784,.1,'triangle');setTimeout(()=>snd(1047,.08,'triangle'),80)}
 function sfxInn(){[392,523,659,784,659,784,1047].forEach((f,i)=>setTimeout(()=>snd(f,.12,'triangle'),i*100))}
 
 /* ===== PLAYER AVATAR ===== */
-/* AVT_BASE replaced by CC_BODY array */
-const ARM_CLR={'':['#d8d8d0','#3060c0','#604020','#f0f0e0'],a1:['#a07040','#806030','#604020','#c09060'],a2:['#808890','#607078','#505860','#a0a8b0'],a3:['#6040c0','#4838a0','#383080','#8060e0'],a4:['#d0a820','#b09018','#806010','#f0d040']};
-const WPN_PX={w1:{c:'#805030',px:[[10,4],[10,5],[11,6],[11,7],[12,8],[12,9]]},w2:{c:'#a0a0a8',px:[[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w3:{c:'#c0c8d0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w4:{c:'#5080e0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,3,'#80c0f0'],[11,3,'#80c0f0']]},w5:{c:'#d0a820',px:[[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,2,'#f0d840'],[11,2,'#f0d840'],[9,4,'#f0d840'],[11,4,'#f0d840']]}};
-const CC_BODY=[
-{d:['0000000000000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0001333100000000','0000666000000000','0006666600000000','0006966600000000','0000777000000000','0000707000000000','0000808000000000','0000000000000000','0000000000000000','0000000000000000']},
-{d:['0000000000000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0001333100000000','0000666000000000','0006666600000000','0006696600000000','0067777600000000','0000404000000000','0000808000000000','0000000000000000','0000000000000000','0000000000000000']},
-{d:['0000012200000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0003333300000000','0000333000000000','0000696000000000','0006666600000000','0036666300000000','0006966600000000','0000777000000000','0000707000000000','0000808000000000','0000000000000000']},
-{d:['0000012200000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0003333300000000','0000333000000000','0000696000000000','0006666600000000','0006696600000000','0067777600000000','0000404000000000','0000808000000000','0000000000000000','0000000000000000']},
-{d:['0000012200000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0003333300000000','0000333000000000','0000696000000000','0066666600000000','0366666630000000','0066966600000000','0000777000000000','0000707000000000','0000808000000000','0000000000000000']},
-{d:['0000012200000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0003333300000000','0000333000000000','0000696000000000','0066666600000000','0066696600000000','0677777600000000','0000404000000000','0000808000000000','0000000000000000','0000000000000000']},
-{d:['0000000000000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0003333300000000','0000333000000000','0000696000000000','0006666600000000','0036666300000000','0006666600000000','0000777000000000','0000808000000000','0000000000000000','0000000000000000']},
-{d:['0000000000000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0003333300000000','0000333000000000','0000696000000000','0006666600000000','0006696600000000','0067777600000000','0000808000000000','0000000000000000','0000000000000000','0000000000000000']}];
+/* ===== 32x32 PROCEDURAL AVATAR ===== */
+const ARM_CLR={'':['#d8d8d0','#3060c0','#604020','#f0f0e0'],a1:['#a07040','#806030','#604020','#c09060'],a2:['#808890','#607078','#505860','#a0a8b0'],a3:['#6040c0','#4838a0','#383080','#8060e0'],a4:['#d0a820','#b09018','#806010','#f0d040'],a5:['#c04020','#a03018','#802010','#e06040'],a6:['#40a0c0','#3080a0','#206080','#60c0e0'],a7:['#30a050','#208040','#186030','#50c070'],a8:['#e0e0f0','#c0c0e0','#a0a0c0','#f0f0ff'],a9:['#2050a0','#183880','#102860','#3068c0'],a10:['#d0a820','#e0c040','#a08018','#f0e060']};
+const WPN_PX={w1:{c:'#805030',px:[[10,4],[10,5],[11,6],[11,7],[12,8],[12,9]]},w2:{c:'#a0a0a8',px:[[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w3:{c:'#c0c8d0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w4:{c:'#5080e0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,3,'#80c0f0'],[11,3,'#80c0f0']]},w5:{c:'#d0a820',px:[[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,2,'#f0d840'],[11,2,'#f0d840'],[9,4,'#f0d840'],[11,4,'#f0d840']]},w6:{c:'#d05020',px:[[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,2,'#f06030'],[11,2,'#f06030'],[9,4,'#f06030'],[11,4,'#f06030']]},w7:{c:'#40a0e0',px:[[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,2,'#80e0ff'],[11,2,'#80e0ff'],[9,4,'#80e0ff'],[11,4,'#80e0ff']]},w8:{c:'#d0d040',px:[[10,0],[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,1,'#f0f060'],[11,1,'#f0f060'],[9,3,'#f0f060'],[11,3,'#f0f060'],[9,5,'#f0f060'],[11,5,'#f0f060']]},w9:{c:'#e0e0f0',px:[[10,0],[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#d0a820'],[9,1,'#f0f0ff'],[11,1,'#f0f0ff'],[9,3,'#f0f0ff'],[11,3,'#f0f0ff']]},w10:{c:'#f0d040',px:[[10,0],[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#d0a820'],[9,0,'#f0e060'],[11,0,'#f0e060'],[9,2,'#f0e060'],[11,2,'#f0e060'],[9,4,'#f0e060'],[11,4,'#f0e060'],[9,6,'#f0e060'],[11,6,'#f0e060']]}};
 const CC_BNAME=['こども♂','こども♀','おとな♂','おとな♀','ちゅうねん♂','ちゅうねん♀','こうれい♂','こうれい♀'];
-const CC_SKIN=[['#f0d0a0','#d0b080'],['#e0b080','#c09060'],['#8b5e3c','#6b4226']];
+const CC_SKIN=[['#f0d0a0','#d0b080','#f8e0c0'],['#e0b080','#c09060','#f0c8a0'],['#8b5e3c','#6b4226','#a07850']];
 const CC_SNAME=['しろ','ふつう','くろ'];
 const CC_HCLR=[['#805030','#604020'],['#202020','#101010'],['#d0a030','#b08020'],['#c03020','#901810'],['#3050b0','#203080'],['#e0e0e0','#b0b0b0'],['#d050a0','#a03878'],['#30a050','#207038']];
 const CC_LOOK=[['#808888','#606868','#484848','#989898'],['#3060c0','#2050a0','#404060','#5080e0'],['#c03040','#a02030','#d0a020','#e06070']];
 const CC_LNAME=['じみ','スタイリッシュ','はなやか'];
-const CC_HAIR=[null,['0000000000000000','0000111000000000','0011111110000000'],['0001120000000000','0011111100000000','0111111110000000'],['0001020100000000','0101111101000000','0011111110000000'],['0011111110000000','0111111111000000','1111111111100000'],['0000221000000000','0001111100000000','0011111110000000'],['0000012200000000','0001111120000000','0011111112000000'],['0110012200110000','0011111100110000','0011111110000000'],['0000010000000000','0000111000000000','0001111100000000'],['0000012200000000','0001111102000000','0011111110200000'],['0000111000000000','0001212100000000','0011111110000000'],['0000012200000000','0001111100200000','0011111110020000'],['0010012010000000','0011111110000000','0111111111000000'],['0001111100000000','0011111110000000','0111111111000000'],['0001110000000000','0011111000000000','0011111110000000'],['0010101010000000','0101111101000000','0011111110000000'],['0000111000000000','0001111100000000','0011111110000000'],['0000012200000000','0001111122000000','0011111112200000'],['0000012200000000','0001111100000000','0011111110200000'],['0000012200000000','0021111120000000','0211111112000000'],['0000000000000000','0000000000000000','0000333300000000'],['0000000000000000','0001211100000000','0011111110000000'],['0101010100000000','1011111101000000','0111111111000000'],['0000112000000000','0001111100000000','0011111112000000'],['0010101010000000','0011111110000000','0211121112000000'],['0000210000000000','0000111000000000','0011111110000000'],['0000112000000000','0011111120000000','0111111112000000'],['0001110000000000','0011111000000000','0012222110000000'],['0000000000000000','0001111100000000','0011111110000000'],['0120012200120000','0011111100110000','0211111112010000']];
 const CC_HNAME=['ふつう','ボウズ','わけめ','ツンツン','アフロ','おかっぱ','ながめ','ツインテ','モヒカン','ポニテ','おだんご','みつあみ','ウルフ','マッシュ','リーゼント','てんパ','ショート','ロング','サイドテ','おさげ','はげ','オールバック','もじゃ','ハーフアップ','ドレッド','さむらい','プリンセス','かりあげ','ベリショ','ロングツイン'];
-function drawAvatar(cv,wpn,arm,cc){const c=cv.getContext('2d');cv.width=16;cv.height=16;c.clearRect(0,0,16,16);const bi=cc?(cc.body??2):2;const body=CC_BODY[bi]||CC_BODY[2];const sk=cc?CC_SKIN[cc.skin]||CC_SKIN[0]:CC_SKIN[0];const hc=cc?CC_HCLR[cc.hair]||CC_HCLR[0]:CC_HCLR[0];const ac=ARM_CLR[arm||'']||ARM_CLR[''];const st=(!arm&&cc)?CC_LOOK[cc.look]||CC_LOOK[0]:ac;const palette=[null,hc[0],hc[1],sk[0],sk[1],'#203880',st[0],st[1],st[2],st[3]];const hs=cc?CC_HAIR[cc.hshape]||null:null;for(let y=0;y<16;y++){const row=(hs&&y<3)?hs[y]:body.d[y];for(let x=0;x<row.length;x++){const i=parseInt(row[x]);if(i>0&&palette[i]){c.fillStyle=palette[i];c.fillRect(x,y,1,1)}}}const wp=WPN_PX[wpn];if(wp)wp.px.forEach(p=>{c.fillStyle=p[2]||wp.c;c.fillRect(p[0],p[1],1,1)})}
+/* Body: h=head size(0small,1med,2tall), bw=body width, bh=body height, lh=leg height, sk=skirt, hu=hunch */
+const CC_PROPS=[
+{h:0,bw:10,bh:7,lh:4},{h:0,bw:9,bh:7,lh:4,sk:1},{h:1,bw:11,bh:9,lh:5},{h:1,bw:10,bh:9,lh:5,sk:1},
+{h:2,bw:13,bh:10,lh:5},{h:2,bw:11,bh:10,lh:5,sk:1},{h:1,bw:10,bh:9,lh:5,hu:1},{h:1,bw:9,bh:9,lh:5,sk:1,hu:1}];
+function drawAvatar(cv,wpn,arm,cc){
+const c=cv.getContext('2d');cv.width=32;cv.height=32;c.clearRect(0,0,32,32);
+const bi=cc?(cc.body??2):2;const pr=CC_PROPS[bi]||CC_PROPS[2];
+const sk=cc?CC_SKIN[cc.skin]||CC_SKIN[0]:CC_SKIN[0];
+const hc=cc?CC_HCLR[cc.hair]||CC_HCLR[0]:CC_HCLR[0];
+const armc=ARM_CLR[arm||'']||ARM_CLR[''];
+const st=(!arm&&cc)?CC_LOOK[cc.look]||CC_LOOK[0]:armc;
+const hs=cc?(cc.hshape||0):0;
+const SM=sk[0],SD=sk[1],SL=sk[2]||SM;
+const HM=hc[0],HD=hc[1];
+const CM=st[0],CD=st[1],CA=st[3]||st[0],CS=st[2]||'#604020';
+const cx=13,headRX=pr.h===0?7:6,headRY=pr.h===0?6:5;
+const headCY=pr.h===0?9:(pr.h===1?8:7);
+const neckY=headCY+headRY+1;
+const bodyY=neckY+(pr.h===0?1:2);
+const legY=bodyY+pr.bh;
+const shoeY=legY+pr.lh;
+const px=(x,y,cl)=>{c.fillStyle=cl;c.fillRect(x,y,1,1)};
+const rect=(x,y,w,h,cl)=>{c.fillStyle=cl;c.fillRect(x,y,w,h)};
+const oval=(ox,oy,rx,ry,cl)=>{c.fillStyle=cl;for(let dy=-ry;dy<=ry;dy++){const w=Math.round(rx*Math.sqrt(Math.max(0,1-(dy*dy)/(ry*ry))));if(w>0)c.fillRect(ox-w,oy+dy,w*2+1,1)}};
+/* hair back layer */
+const longBack=(hs===6||hs===17||hs===26||hs===29);
+const ponyBack=(hs===9||hs===11||hs===23);
+if(longBack){rect(cx-4,headCY+headRY-1,9,shoeY-(headCY+headRY)+2,HM);rect(cx-3,headCY+headRY,7,shoeY-(headCY+headRY)+1,HD)}
+if(ponyBack){rect(cx-2,headCY+headRY,5,Math.min(12,shoeY-(headCY+headRY)+1),HM);rect(cx-1,headCY+headRY+1,3,Math.min(10,shoeY-(headCY+headRY)),HD)}
+if(hs===7||hs===29){rect(cx-headRX-3,headCY+2,4,Math.min(14,shoeY-headCY),HM);rect(cx+headRX,headCY+2,4,Math.min(14,shoeY-headCY),HM);rect(cx-headRX-2,headCY+3,2,Math.min(12,shoeY-headCY-1),HD);rect(cx+headRX+1,headCY+3,2,Math.min(12,shoeY-headCY-1),HD)}
+if(hs===19){rect(cx-headRX-2,headCY+2,3,Math.min(12,shoeY-headCY),HM);rect(cx+headRX,headCY+2,3,Math.min(12,shoeY-headCY),HM)}
+/* legs */
+const legW=Math.max(2,Math.floor(pr.bw*0.28));const legGap=1;
+rect(cx-legGap-legW,legY,legW,pr.lh,CD);rect(cx+legGap+1,legY,legW,pr.lh,CD);
+/* shoes */
+rect(cx-legGap-legW-1,shoeY,legW+2,2,CS);rect(cx+legGap,shoeY,legW+2,2,CS);
+/* body */
+const bx=cx-Math.floor(pr.bw/2);
+rect(bx,bodyY,pr.bw,pr.bh,CM);
+rect(bx,bodyY,pr.bw,1,CA);
+px(cx,bodyY+Math.floor(pr.bh/2),CA);
+rect(bx+1,bodyY+1,pr.bw-2,1,CD);
+if(pr.sk){const skW=pr.bw+2;rect(cx-Math.floor(skW/2),bodyY+pr.bh-3,skW,4,CD);rect(cx-Math.floor(skW/2)+1,bodyY+pr.bh-2,skW-2,2,CM)}
+/* arms */
+rect(bx-2,bodyY+1,2,pr.bh-2,CM);rect(bx+pr.bw,bodyY+1,2,pr.bh-2,CM);
+rect(bx-2,bodyY+pr.bh-1,2,1,SM);rect(bx+pr.bw,bodyY+pr.bh-1,2,1,SM);
+/* neck */
+rect(cx-1,neckY,3,bodyY-neckY,SM);
+/* head */
+oval(cx,headCY,headRX,headRY,SM);
+/* ears */
+px(cx-headRX-1,headCY,SM);px(cx-headRX-1,headCY+1,SD);
+px(cx+headRX+1,headCY,SM);px(cx+headRX+1,headCY+1,SD);
+/* jawline shadow */
+for(let dx=-2;dx<=2;dx++)px(cx+dx,headCY+headRY,SD);
+/* eyes */
+const eyr=headCY+1;
+c.fillStyle='#f0f0e8';c.fillRect(cx-5,eyr,3,2);c.fillRect(cx+3,eyr,3,2);
+c.fillStyle='#1a1a30';c.fillRect(cx-4,eyr,2,2);c.fillRect(cx+4,eyr,2,2);
+c.fillStyle='#fff';px(cx-5,eyr,'#fff');px(cx+3,eyr,'#fff');
+/* brows */
+c.fillStyle=HD;c.fillRect(cx-5,eyr-1,3,1);c.fillRect(cx+3,eyr-1,3,1);
+/* nose */
+px(cx,eyr+3,SD);
+/* mouth */
+c.fillStyle='#d07878';c.fillRect(cx-1,eyr+4,3,1);
+/* blush */
+c.fillStyle='rgba(240,160,160,0.4)';c.fillRect(cx-6,eyr+2,2,1);c.fillRect(cx+5,eyr+2,2,1);
+/* ===== HAIR 32x32 procedural ===== */
+const htop=headCY-headRY;
+const drawCap=(et,es)=>{c.fillStyle=HM;for(let dy=-headRY-et;dy<=-headRY+3+es;dy++){let w=Math.round((headRX+1+es)*Math.sqrt(Math.max(0,1-((dy+et)*(dy+et))/((headRY+et)*(headRY+et)))));if(w>0)c.fillRect(cx-w,headCY+dy,w*2+1,1)}};
+const drawSides=(len,w)=>{for(let dy=0;dy<len;dy++){rect(cx-headRX-w,headCY-headRY+4+dy,w,1,HM);rect(cx+headRX+1,headCY-headRY+4+dy,w,1,HM)}};
+const drawBangs=(sty)=>{
+c.fillStyle=HM;const by=htop+3;
+if(sty==='full')c.fillRect(cx-headRX+1,by,headRX*2-1,2);
+else if(sty==='side'){c.fillRect(cx-headRX+1,by,4,2);c.fillRect(cx+headRX-4,by,4,2)}
+else if(sty==='left'){c.fillRect(cx-headRX+1,by,5,2);c.fillRect(cx-headRX+1,by+2,3,1)}
+else if(sty==='right'){c.fillRect(cx+headRX-4,by,4,2);c.fillRect(cx+headRX-3,by+2,3,1)}
+else if(sty==='split'){c.fillRect(cx-headRX+1,by,3,2);c.fillRect(cx+headRX-3,by,3,2)}};
+c.fillStyle=HM;
+switch(hs){
+case 0:drawCap(2,1);drawSides(5,2);drawBangs('side');break;
+case 1:drawCap(1,0);break;
+case 2:drawCap(2,1);drawSides(5,2);drawBangs('split');c.fillStyle=HD;px(cx,htop+1,HD);px(cx,htop+2,HD);break;
+case 3:drawCap(2,1);drawSides(4,2);drawBangs('side');c.fillStyle=HM;for(let i=-3;i<=3;i++){const sx=cx+i*3,sy=htop-4+Math.abs(i)*2;rect(sx,sy,2,htop+3-sy,HM)};break;
+case 4:oval(cx,headCY-1,headRX+4,headRY+4,HM);oval(cx,headCY,headRX,headRY,SM);break;
+case 5:drawCap(2,2);drawSides(8,3);drawBangs('full');break;
+case 6:drawCap(2,1);drawSides(6,2);drawBangs('side');break;
+case 7:drawCap(2,1);drawSides(3,2);drawBangs('side');break;
+case 8:c.fillStyle=HM;rect(cx-2,htop-6,5,6,HM);rect(cx-1,htop-8,3,2,HM);drawCap(1,0);break;
+case 9:drawCap(2,1);drawSides(4,2);drawBangs('side');break;
+case 10:drawCap(2,1);drawSides(4,2);drawBangs('side');oval(cx,htop-3,3,3,HM);break;
+case 11:drawCap(2,1);drawSides(5,2);drawBangs('side');break;
+case 12:drawCap(3,2);drawSides(8,3);c.fillStyle=HM;for(let i=0;i<6;i++){rect(cx-headRX-2+Math.floor(i*0.5),headCY+2+i,2,2,HM);rect(cx+headRX+1-Math.floor(i*0.5),headCY+2+i,2,2,HM)};drawBangs('side');break;
+case 13:drawCap(2,2);drawSides(4,3);drawBangs('full');c.fillStyle=HM;c.fillRect(cx-headRX,htop+3,headRX*2+1,2);break;
+case 14:drawCap(1,1);c.fillStyle=HM;for(let i=0;i<6;i++)rect(cx-3+i,htop-6+Math.floor(i*0.8),2,6-i,HM);drawSides(3,1);break;
+case 15:drawCap(2,2);drawSides(6,2);{const sd=bi*7+13;for(let i=0;i<8;i++){const ax=cx-headRX-1+((sd+i*7)%((headRX+1)*2));const ay=htop-1+Math.floor(i*1.3);px(ax,ay,HM);px(ax+1,ay,HD)}};drawBangs('side');break;
+case 16:drawCap(2,1);drawSides(3,2);drawBangs('side');break;
+case 17:drawCap(2,1);drawSides(6,2);drawBangs('side');break;
+case 18:drawCap(2,1);drawSides(4,2);drawBangs('left');rect(cx+headRX+1,headCY,3,12,HM);rect(cx+headRX+2,headCY+1,2,10,HD);break;
+case 19:drawCap(2,1);drawSides(3,2);drawBangs('side');break;
+case 20:c.fillStyle=SL;oval(cx,headCY,headRX,headRY,SL);oval(cx,headCY+1,headRX-1,headRY-1,SM);break;
+case 21:drawCap(2,1);drawSides(4,1);c.fillStyle=HD;for(let i=-2;i<=2;i++)px(cx+i,htop+1,HD);break;
+case 22:drawCap(3,3);drawSides(7,3);{const sd=bi*7+13;for(let i=0;i<12;i++){const ax=cx-headRX-3+((sd+i*5)%((headRX*2+6)));const ay=htop-3+Math.floor(i*0.8);rect(ax,ay,2,2,i%2?HM:HD)}};drawBangs('full');break;
+case 23:drawCap(2,1);drawSides(5,2);drawBangs('side');oval(cx,htop-1,2,2,HM);break;
+case 24:drawCap(2,2);drawSides(4,2);for(let i=0;i<6;i++){const dx=cx-headRX+Math.floor(i*((headRX*2)/5));rect(dx,headCY+headRY-2,2,10,HM);if(i%2)rect(dx,headCY+headRY,1,8,HD)};drawBangs('side');break;
+case 25:drawCap(1,0);rect(cx-2,htop-4,5,4,HM);rect(cx-1,htop-5,3,2,HD);rect(cx-1,htop-2,3,1,HD);break;
+case 26:drawCap(2,1);drawSides(6,2);drawBangs('full');c.fillStyle='#d0a820';rect(cx-headRX+1,htop+2,headRX*2-1,1,'#d0a820');px(cx,htop+1,'#f0d840');px(cx-3,htop+2,'#f0d840');px(cx+3,htop+2,'#f0d840');break;
+case 27:drawCap(2,1);c.fillStyle=HD;for(let dy=2;dy<=headRY;dy++){const w=Math.round(headRX*Math.sqrt(Math.max(0,1-(dy*dy)/(headRY*headRY))));px(cx-w,headCY+dy,HD);px(cx+w,headCY+dy,HD)};drawBangs('side');break;
+case 28:drawCap(1,0);drawSides(2,1);break;
+default:drawCap(2,1);drawSides(3,2);drawBangs('side');break;
+}
+/* weapon at 2x */
+const wp=WPN_PX[wpn];if(wp)wp.px.forEach(p=>{c.fillStyle=p[2]||wp.c;c.fillRect(p[0]*2,p[1]*2,2,2)});
+/* armor body overlay */
+if(arm&&ARM_CLR[arm]){const ac2=ARM_CLR[arm];rect(bx,bodyY,pr.bw,pr.bh,ac2[0]);rect(bx,bodyY,pr.bw,1,ac2[3]||ac2[0]);rect(bx+1,bodyY+1,pr.bw-2,1,ac2[1]);px(cx,bodyY+Math.floor(pr.bh/2),ac2[3]||ac2[0]);rect(bx-2,bodyY+1,2,pr.bh-2,ac2[0]);rect(bx+pr.bw,bodyY+1,2,pr.bh-2,ac2[0])}
+}
 
 const SHOP_ARMOR=[
   {id:'a1',name:'かわのふく',desc:'ぼうぎょ+2',def:2,cost:40},
   {id:'a2',name:'てつのよろい',desc:'ぼうぎょ+5',def:5,cost:150},
   {id:'a3',name:'まほうのローブ',desc:'ぼうぎょ+8',def:8,cost:350},
   {id:'a4',name:'でんせつのよろい',desc:'ぼうぎょ+15',def:15,cost:900},
+  {id:'a5',name:'ほのおのよろい',desc:'ぼうぎょ+22',def:22,cost:1600},
+  {id:'a6',name:'こおりのよろい',desc:'ぼうぎょ+30',def:30,cost:3000},
+  {id:'a7',name:'りゅうのよろい',desc:'ぼうぎょ+40',def:40,cost:5000},
+  {id:'a8',name:'てんしのローブ',desc:'ぼうぎょ+52',def:52,cost:8500},
+  {id:'a9',name:'しんかいのよろい',desc:'ぼうぎょ+65',def:65,cost:14000},
+  {id:'a10',name:'かみのよろい',desc:'ぼうぎょ+80',def:80,cost:22000},
 ];
 
 /* ===== SHOP DATA ===== */
@@ -505,6 +625,11 @@ const SHOP_WEAPONS=[
   {id:'w3',name:'はがねのけん',desc:'こうげき+8',atk:8,cost:280},
   {id:'w4',name:'まほうのけん',desc:'こうげき+12',atk:12,cost:500},
   {id:'w5',name:'でんせつのけん',desc:'こうげき+18',atk:18,cost:1000},
+  {id:'w6',name:'ほのおのけん',desc:'こうげき+25',atk:25,cost:1800},
+  {id:'w7',name:'こおりのつるぎ',desc:'こうげき+33',atk:33,cost:3200},
+  {id:'w8',name:'らいじんのけん',desc:'こうげき+42',atk:42,cost:5500},
+  {id:'w9',name:'せいけん',desc:'こうげき+52',atk:52,cost:9000},
+  {id:'w10',name:'しんわのけん',desc:'こうげき+65',atk:65,cost:15000},
 ];
 const SHOP_ITEMS=[
   {id:'i1',name:'やくそう',desc:'HP+30',heal:30,cost:15},
@@ -514,14 +639,30 @@ const SHOP_ITEMS=[
 const INN_COST=25;
 
 /* ===== WORDS ===== */
-const WPC={1:['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],2:['a','i','u','e','o','ka','ki','ku','ke','ko','sa','si','su','se','so','ta','ti','tu','te','to','na','ni','nu','ne','no','ha','hi','hu','he','ho','ma','mi','mu','me','mo','ya','yu','yo','ra','ri','ru','re','ro','wa','nn'],3:['neko','inu','sora','umi','yama','hana','kaze','tsuki','hoshi','kumo','ame','yuki','tori','sakana','mizu','mori','kawa','machi','sakura','ringo','sensei','gakkou','origami','karate','samurai','tanuki','usagi','kuma','kirin','zou','raion','penguin','iruka','kujira','tobira','densha','hikari','kagami','tokei','kutsu','hon','enpitsu','keshigomu','randoseru','taiko','piano','chikyuu','uchuu','rocket','dinosaur','volcano','crystal','rainbow','thunder'],4:['sora ha aoi','umi ha hiroi','hana ga saku','kaze ga fuku','ame ga furu','tori ga utau','neko ga warau','inu ga hashiru','ohayou gozaimasu','konnichiha','arigatou','gomen nasai','itadakimasu','gochisousama','okaeri nasai','oyasumi nasai','ganbatte ne','tanoshii na','oishii gohan','genki desu ka','ashita mo ganbarou','kyou ha ii hi da','mizu wo nomo u','soto de asobou','hayaku hashirou','ookiku naritai','yume wo mite iru','himitsu no basho','chiisana bouken','niji ga mieru','hoshi ga kirei','kaze ga kimochi ii','taiyou ga noboru','asa gohan tabeta','homework owaranai','suugaku ga suki','taiiku ga tanoshii','toshokan de yomu','puuru de oyogu','doubutsuen ni ikou'],5:['kyou ha totemo ii tenki desu','ashita ha gakkou ga yasumi desu','watashi ha ringo ga suki desu','ookina ki no shita de asobou','umi de oyogu no ha tanoshii','yama ni nobotte keshiki wo miyou','tomodachi to issho ni asobou','sekai ha fushigi de ippai da','yuuki wo motte bouken shiyou','donna toki mo egao wo wasurenai','hayaoki ha sanmon no toku','nana korobi ya oki','saru mo ki kara ochiru','ame futte ji katamaru','isogaba maware','chiri mo tsumoreba yama to naru','ichi nichi issho no egao wo','minna de chikara wo awaseyou','shiranai koto wo manabu no ha tanoshii','mirai ha jibun de tsukuru mono da']};
-const WMB={1:WPC[1],2:['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','ん'],3:['ねこ','いぬ','そら','うみ','やま','はな','かぜ','つき','ほし','くも','あめ','ゆき','とり','さかな','みず','もり','かわ','まち','さくら','りんご','せんせい','がっこう','おりがみ','からて','さむらい','たぬき','うさぎ','くま','きりん','ぞう','らいおん','ぺんぎん','いるか','くじら','とびら','でんしゃ','ひかり','かがみ','とけい','くつ','ほん','えんぴつ','けしごむ','らんどせる','たいこ','ぴあの','ちきゅう','うちゅう','ろけっと','にじ','かみなり'],4:['そらはあおい','うみはひろい','はながさく','かぜがふく','あめがふる','とりがうたう','ねこがわらう','いぬがはしる','おはよう','こんにちは','ありがとう','ごめんなさい','いただきます','ごちそうさま','おかえりなさい','おやすみなさい','がんばってね','たのしいな','おいしいごはん','げんきですか','あしたもがんばろう','きょうはいいひだ','みずをのもう','そとであそぼう','はやくはしろう','おおきくなりたい','ゆめをみている','ひみつのばしょ','ちいさなぼうけん','にじがみえる','ほしがきれい','かぜがきもちいい','たいようがのぼる','あさごはんたべた','しゅくだいおわらない','さんすうがすき','たいいくがたのしい','としょかんでよむ','ぷーるでおよぐ','どうぶつえんにいこう'],5:['きょうはとてもいいてんきです','あしたはがっこうがやすみです','わたしはりんごがすきです','おおきなきのしたであそぼう','うみでおよぐのはたのしい','やまにのぼってけしきをみよう','ともだちといっしょにあそぼう','せかいはふしぎでいっぱいだ','ゆうきをもってぼうけんしよう','どんなときもえがおをわすれない','はやおきはさんもんのとく','ななころびやおき','さるもきからおちる','あめふってじかたまる','いそがばまわれ','ちりもつもればやまとなる','いちにちいっしょうのえがおを','みんなでちからをあわせよう','しらないことをまなぶのはたのしい','みらいはじぶんでつくるものだ']};
-const SD_PC=['アルファベット 1もじ','ひらがな > ローマじ','たんご > ローマじ','にほんご フレーズ','にほんご ちょうぶん'];
-const SD_MB=['アルファベット 1もじ','ひらがな 1もじ','にほんご たんご','にほんご フレーズ','にほんご ちょうぶん'];
-function getW(s){return WMB[Math.min(s,5)]}
-function getD(s){return SD_MB[Math.min(s,5)-1]}
+const WPC={1:['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'],2:['a','i','u','e','o','ka','ki','ku','ke','ko','sa','si','su','se','so','ta','ti','tu','te','to','na','ni','nu','ne','no','ha','hi','hu','he','ho','ma','mi','mu','me','mo','ya','yu','yo','ra','ri','ru','re','ro','wa','nn'],3:['neko','inu','sora','umi','yama','hana','kaze','tsuki','hoshi','kumo','ame','yuki','tori','sakana','mizu','mori','kawa','machi','sakura','ringo','sensei','gakkou','origami','karate','samurai','tanuki','usagi','kuma','kirin','zou','raion','penguin','iruka','kujira','tobira','densha','hikari','kagami','tokei','kutsu','hon','enpitsu','keshigomu','randoseru','taiko','piano','chikyuu','uchuu','rocket','dinosaur','volcano','crystal','rainbow','thunder'],4:['sora ha aoi','umi ha hiroi','hana ga saku','kaze ga fuku','ame ga furu','tori ga utau','neko ga warau','inu ga hashiru','ohayou gozaimasu','konnichiha','arigatou','gomen nasai','itadakimasu','gochisousama','okaeri nasai','oyasumi nasai','ganbatte ne','tanoshii na','oishii gohan','genki desu ka','ashita mo ganbarou','kyou ha ii hi da','mizu wo nomo u','soto de asobou','hayaku hashirou','ookiku naritai','yume wo mite iru','himitsu no basho','chiisana bouken','niji ga mieru','hoshi ga kirei','kaze ga kimochi ii','taiyou ga noboru','asa gohan tabeta','homework owaranai','suugaku ga suki','taiiku ga tanoshii','toshokan de yomu','puuru de oyogu','doubutsuen ni ikou'],5:['kyou ha totemo ii tenki desu','ashita ha gakkou ga yasumi desu','watashi ha ringo ga suki desu','ookina ki no shita de asobou','umi de oyogu no ha tanoshii','yama ni nobotte keshiki wo miyou','tomodachi to issho ni asobou','sekai ha fushigi de ippai da','yuuki wo motte bouken shiyou','donna toki mo egao wo wasurenai','hayaoki ha sanmon no toku','nana korobi ya oki','saru mo ki kara ochiru','ame futte ji katamaru','isogaba maware','chiri mo tsumoreba yama to naru','ichi nichi issho no egao wo','minna de chikara wo awaseyou','shiranai koto wo manabu no ha tanoshii','mirai ha jibun de tsukuru mono da'],6:['nihon ha utsukushii kuni desu','toshokan de hon wo yomimashou','kyou no shukudai ha muzukashii na','gakkou no tomodachi to asonda','natsu yasumi ni umi ni ikitai'],7:['maiasa hayaku okite taisou wo suru','jitensha de gakkou made iku no ga suki','kyouryuu ha mukashi chikyuu ni ita nda yo','uchuu hikoushi ni naru no ga yume desu'],8:['yuuki wo motte tatakae ba kanarazu michi ha hirakeru','nihon ni ha shiki ga atte sorezore utsukushii','sekaijuu no hito ga shiawase ni nareru to ii na'],9:['kono sekai ni ha mada dare mo shiranai himitsu ga kakusareteiru','densetsu ni yoru to sennen mae ni maou wo taoshita yuusha ga ita'],10:['kono tabi no owari ni matteiru no ha sekai wo sukuu saigo no tatakai da','densetsu no yuusha yo ima koso chikara wo kaihou shite heiwa wo torimodo se']};
+const WMB={1:WPC[1],2:['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','ん'],3:['ねこ','いぬ','そら','うみ','やま','はな','かぜ','つき','ほし','くも','あめ','ゆき','とり','さかな','みず','もり','かわ','まち','さくら','りんご','せんせい','がっこう','おりがみ','からて','さむらい','たぬき','うさぎ','くま','きりん','ぞう','らいおん','ぺんぎん','いるか','くじら','とびら','でんしゃ','ひかり','かがみ','とけい','くつ','ほん','えんぴつ','けしごむ','らんどせる','たいこ','ぴあの','ちきゅう','うちゅう','ろけっと','にじ','かみなり'],4:['そらはあおい','うみはひろい','はながさく','かぜがふく','あめがふる','とりがうたう','ねこがわらう','いぬがはしる','おはよう','こんにちは','ありがとう','ごめんなさい','いただきます','ごちそうさま','おかえりなさい','おやすみなさい','がんばってね','たのしいな','おいしいごはん','げんきですか','あしたもがんばろう','きょうはいいひだ','みずをのもう','そとであそぼう','はやくはしろう','おおきくなりたい','ゆめをみている','ひみつのばしょ','ちいさなぼうけん','にじがみえる','ほしがきれい','かぜがきもちいい','たいようがのぼる','あさごはんたべた','しゅくだいおわらない','さんすうがすき','たいいくがたのしい','としょかんでよむ','ぷーるでおよぐ','どうぶつえんにいこう'],5:['きょうはとてもいいてんきです','あしたはがっこうがやすみです','わたしはりんごがすきです','おおきなきのしたであそぼう','うみでおよぐのはたのしい','やまにのぼってけしきをみよう','ともだちといっしょにあそぼう','せかいはふしぎでいっぱいだ','ゆうきをもってぼうけんしよう','どんなときもえがおをわすれない','はやおきはさんもんのとく','ななころびやおき','さるもきからおちる','あめふってじかたまる','いそがばまわれ','ちりもつもればやまとなる','いちにちいっしょうのえがおを','みんなでちからをあわせよう','しらないことをまなぶのはたのしい','みらいはじぶんでつくるものだ'],
+6:['にほんはうつくしいくにです','としょかんでほんをよみましょう','きょうのしゅくだいはむずかしいな','がっこうのともだちとあそんだ','なつやすみにうみにいきたい','おかあさんのりょうりはおいしい','にわでいぬとあそんでいる','まいにちれんしゅうするとうまくなる','つぎのしあいはかならずかつぞ','てんきがよいひはそとであそぼう','あたらしいゲームがほしいな','テストでひゃくてんをとりたい','やすみのひはゆっくりねたい','おとうさんといっしょにつりにいく','おおきくなったらいしゃになりたい','ちきゅうはまるいほしです','うちゅうにはほしがたくさんある','にじいろのそらがきれいだった','ともだちにてがみをかいた','どうぶつえんでぱんだをみた'],
+7:['まいあさはやくおきてたいそうをする','じてんしゃでがっこうまでいくのがすき','きょうりゅうはむかしちきゅうにいたんだよ','うちゅうひこうしになるのがゆめです','やまのてっぺんからのけしきはさいこう','プログラミングでゲームをつくりたい','がんばればなんでもできるようになる','かぜのつよいひはとぶのがたのしそう','ふゆはゆきだるまをつくろう','かぞくみんなでりょこうにいきたいな','ともだちとちからをあわせてクリアしよう','むずかしいもんだいもあきらめないぞ','まほうつかいになれたらそらをとびたい','りゅうのせなかにのってぼうけんしたい','でんせつのゆうしゃはつよくてやさしい','あめのひもたのしいことはたくさんある','おおきなきのしたでひるねがしたい','しんかいにはふしぎないきものがいる','そらのうえにはてんくうのしろがある','たいせつなひとをまもれるようになりたい'],
+8:['ゆうきをもってたたかえばかならずみちはひらける','にほんにはしきがあってそれぞれうつくしい','せかいじゅうのひとがしあわせになれるといいな','どんなにつよいてきでもなかまがいればこわくない','まいにちこつこつれんしゅうすればうまくなれる','ゆめをかなえるためにはあきらめないことがだいじ','おおきなもくひょうをもってまいにちがんばろう','しらないことをしるのはとてもたのしいことだ','じぶんのちからをしんじてさいごまであきらめない','ともだちがこまっているときはたすけてあげよう','ちいさなどりょくのつみかさねがおおきなけっかになる','ぼうけんのたびにでてあたらしいせかいをみよう','つよくなるためにはまずじぶんのよわさをしること','でんせつのけんをてにいれるためにしれんにいどむ','やまをこえてうみをわたりさばくをぬけてすすもう'],
+9:['このせかいにはまだだれもしらないひみつがかくされている','でんせつによるとせんねんまえにまおうをたおしたゆうしゃがいた','そらのはてにあるというでんせつのしまをめざしてたびにでよう','なかまとちからをあわせてどんなこんなんもきりぬけていこう','まほうのちからをてにいれるにはこころのつよさがひつようだ','やまをこえうみをわたりさばくをぬけてやっとたどりついた','しんじるこころがあればどんなやみのなかでもひかりはみえる','さいごのたたかいにそなえてなかまたちとさくせんをたてよう','つよさとはちからだけではなくだいじなひとをおもうこころだ','でんせつのりゅうはせかいをまもるためにたたかいつづけている'],
+10:['このたびのおわりにまっているのはせかいをすくうさいごのたたかいだ','でんせつのゆうしゃよいまこそちからをかいほうしてへいわをとりもどせ','ひかりとやみのたたかいはおわることなくえいえんにつづいていくのか','ぼうけんのなかでであったなかまたちとのきずながさいごのちからとなった','すべてのしれんをのりこえたそのさきにはあたらしいぼうけんがまっている','まおうをたおしたゆうしゃはこうしていいつたえられでんせつとなった','せかいにへいわがもどりすべてのひとびとのかおにえがおがもどった','ほんとうのつよさとはよわさをみとめそれでもまえにすすむゆうきのことだ']};
+const SD_PC=['アルファベット 1もじ','ひらがな > ローマじ','たんご > ローマじ','にほんご フレーズ','にほんご ちょうぶん','むずかしい ぶんしょう','ちょうせん ぶんしょう','ちょうなが ぶんしょう','スーパー ぶんしょう','でんせつの ぶんしょう'];
+const SD_MB=['アルファベット 1もじ','ひらがな 1もじ','にほんご たんご','にほんご フレーズ','にほんご ちょうぶん','むずかしい ぶんしょう','ちょうせん ぶんしょう','ちょうなが ぶんしょう','スーパー ぶんしょう','でんせつの ぶんしょう'];
+function getW(s){return WMB[Math.min(s,10)]}
+function getD(s){return SD_MB[Math.min(s,10)-1]}
 
-const MONS=[[{name:'スライム',key:'slime',hp:15,xp:12},{name:'きのこ',key:'mushroom',hp:18,xp:14}],[{name:'ゴブリン',key:'goblin',hp:28,xp:20},{name:'コウモリ',key:'bat',hp:30,xp:22},{name:'スライム',key:'slime',hp:22,xp:16}],[{name:'ウルフ',key:'wolf',hp:45,xp:35},{name:'スケルトン',key:'skeleton',hp:55,xp:40},{name:'ゴースト',key:'ghost',hp:40,xp:32},{name:'ゴブリン',key:'goblin',hp:38,xp:28}],[{name:'ゾンビ',key:'zombie',hp:75,xp:55},{name:'サソリ',key:'scorpion',hp:85,xp:60},{name:'ゴーレム',key:'golem',hp:100,xp:70},{name:'ドラゴン',key:'dragon',hp:110,xp:85}],[{name:'ドラゴン',key:'dragon',hp:160,xp:120},{name:'まほうつかい',key:'wizard',hp:140,xp:110},{name:'まおう',key:'boss',hp:280,xp:220}]];
+const MONS=[
+[{name:'スライム',key:'slime',hp:15,xp:12},{name:'きのこ',key:'mushroom',hp:18,xp:14}],
+[{name:'ゴブリン',key:'goblin',hp:28,xp:20},{name:'コウモリ',key:'bat',hp:30,xp:22},{name:'スライム',key:'slime',hp:22,xp:16}],
+[{name:'ウルフ',key:'wolf',hp:45,xp:35},{name:'スケルトン',key:'skeleton',hp:55,xp:40},{name:'ゴースト',key:'ghost',hp:40,xp:32},{name:'ゴブリン',key:'goblin',hp:38,xp:28}],
+[{name:'ゾンビ',key:'zombie',hp:75,xp:55},{name:'サソリ',key:'scorpion',hp:85,xp:60},{name:'ゴーレム',key:'golem',hp:100,xp:70},{name:'ドラゴン',key:'dragon',hp:110,xp:85}],
+[{name:'ドラゴン',key:'dragon',hp:160,xp:120},{name:'まほうつかい',key:'wizard',hp:140,xp:110},{name:'まおう',key:'boss',hp:280,xp:220}],
+[{name:'ハーピー',key:'harpy',hp:200,xp:150},{name:'フェニックス',key:'phoenix',hp:240,xp:180},{name:'ゴースト',key:'ghost',hp:180,xp:130},{name:'まほうつかい',key:'wizard',hp:220,xp:165}],
+[{name:'イエティ',key:'yeti',hp:320,xp:230},{name:'ダークナイト',key:'darkKnight',hp:380,xp:270},{name:'ゴーレム',key:'golem',hp:300,xp:210},{name:'ドラゴン',key:'dragon',hp:350,xp:250}],
+[{name:'リッチ',key:'lich',hp:480,xp:340},{name:'クラーケン',key:'kraken',hp:520,xp:370},{name:'ヒュドラ',key:'hydra',hp:560,xp:400},{name:'ダークナイト',key:'darkKnight',hp:500,xp:360}],
+[{name:'ヒュドラ',key:'hydra',hp:720,xp:510},{name:'フェニックス',key:'phoenix',hp:680,xp:480},{name:'リッチ',key:'lich',hp:640,xp:460},{name:'しんりゅう',key:'shinryu',hp:550,xp:420}],
+[{name:'しんりゅう',key:'shinryu',hp:1200,xp:850},{name:'ヒュドラ',key:'hydra',hp:1000,xp:720},{name:'リッチ',key:'lich',hp:950,xp:680},{name:'やみのていおう',key:'boss',hp:2200,xp:1600}]
+];
 
 /* ===== KEYBOARD ===== */
 const KBR=[['Q','W','E','R','T','Y','U','I','O','P'],['A','S','D','F','G','H','J','K','L'],['Z','X','C','V','B','N','M']];
@@ -556,11 +697,12 @@ const Game={
 
   showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='ranking-screen')this.renderR();if(id==='free-screen')setTimeout(()=>document.getElementById('free-input').focus(),50)},
 
-  startAdventure(){try{initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';if(!this.p.items)this.p.items={};this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=7?3:this.p.level<=10?4:5;this._playStart=Date.now();this.save();this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;this.stageGold=0;this.pMaxHp=80+this.p.level*10;this.pHp=this.pMaxHp;mI.value='';this.mOffset=0;this.spawnM();this.showScreen('battle-screen');this.updateS();this.updatePHP();this.refreshAvatar();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)}catch(e){alert('Error: '+e.message);console.error(e)}},
+  getWPS(){return [10,10,10,10,10,12,12,14,14,16][Math.min(this.stage-1,9)]},
+  startAdventure(){try{initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';if(!this.p.items)this.p.items={};this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=6?3:this.p.level<=8?4:this.p.level<=10?5:this.p.level<=13?6:this.p.level<=16?7:this.p.level<=20?8:this.p.level<=25?9:10;this._playStart=Date.now();this.save();this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;this.stageGold=0;this.pMaxHp=80+this.p.level*10;this.pHp=this.pMaxHp;mI.value='';this.mOffset=0;this.spawnM();this.showScreen('battle-screen');this.updateS();this.updatePHP();this.refreshAvatar();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)}catch(e){alert('Error: '+e.message);console.error(e)}},
 
   backToTitle(){this.stopAtkTimer();this.save();this.renderSlots();this.selectSlot(this.activeSlot);this.showScreen('title-screen')},
 
-  spawnM(){const pool=MONS[Math.min(this.stage,5)-1];const base=pool[Math.floor(Math.random()*pool.length)];const sc=1+(this.p.level-1)*.08;this.mon={...base};this.mMax=Math.floor(base.hp*sc);this.mHp=this.mMax;const cv=document.getElementById('m-canvas');cv.className='mon-canvas';drawMon(cv,base.key);document.getElementById('m-name').textContent=base.name;document.getElementById('m-stage').textContent='STAGE '+this.stage+' - '+this.p.name;document.getElementById('stage-desc').textContent='> '+getD(this.stage);document.getElementById('typing-hint').textContent=isMobile?'うえの もじを そのまま うってね':'キーボードで うちこもう! BS でけせるよ';this.updateHP();const ac=ATK_CFG[Math.min(this.stage,5)-1];this.atkMax=ac.time;this.atkDmg=ac.dmg;this.nextW()},
+  spawnM(){const pool=MONS[Math.min(this.stage,10)-1];const base=pool[Math.floor(Math.random()*pool.length)];const sc=1+(this.p.level-1)*.08;this.mon={...base};this.mMax=Math.floor(base.hp*sc);this.mHp=this.mMax;const cv=document.getElementById('m-canvas');cv.className='mon-canvas';drawMon(cv,base.key);document.getElementById('m-name').textContent=base.name;document.getElementById('m-stage').textContent='STAGE '+this.stage+' - '+this.p.name;document.getElementById('stage-desc').textContent='> '+getD(this.stage);document.getElementById('typing-hint').textContent=isMobile?'うえの もじを そのまま うってね':'キーボードで うちこもう! BS でけせるよ';this.updateHP();const ac=ATK_CFG[Math.min(this.stage,10)-1];this.atkMax=ac.time;this.atkDmg=ac.dmg;this.nextW()},
 
   nextW(){const wl=getW(this.stage);if(this.wBagS!==this.stage||this.wBag.length===0){this.wBag=[...wl].sort(()=>Math.random()-.5);this.wBagS=this.stage}if(this.wBag.length===0)this.wBag=[...wl].sort(()=>Math.random()-.5);this.word=this.wBag.pop();this.chars=this.word.split('').map(c=>({c,s:'pending'}));this.cur=0;this.hasErr=false;this.wS=Date.now();if(isMobile){this.mDL=0}this.renderW();if(!isMobile)showNext(this.chars[0]?.c);this.resetAtk()},
 
@@ -582,15 +724,15 @@ const Game={
 
   triggerSkill(sk,baseDmg){this.stopAtkTimer();const bonusDmg=Math.floor(baseDmg*(sk.mult-1));sfxSkill(sk);const ov=document.getElementById('skill-overlay');ov.innerHTML='<div class="skill-flash" style="--sk-c:'+sk.color+'"></div><div class="skill-label">ひっさつわざ</div><div class="skill-name" style="--sk-c:'+sk.color+'">'+sk.name+'</div><div class="skill-dmg" id="skill-dmg-live"></div>';ov.classList.remove('active');ov.offsetHeight;ov.classList.add('active');document.body.classList.add('screen-shake');setTimeout(()=>document.body.classList.remove('screen-shake'),400);for(let i=0;i<40;i++){spawnP(Math.random()*window.innerWidth,Math.random()*window.innerHeight*.6,sk.pc[i%sk.pc.length],2)}setTimeout(()=>{this.mHp=Math.max(0,this.mHp-bonusDmg);this.updateHP();const dd=document.getElementById('skill-dmg-live');if(dd)dd.textContent='-'+bonusDmg;spawnBoom(window.innerWidth/2,window.innerHeight*.3);const cv=document.getElementById('m-canvas');cv.classList.add('hit');setTimeout(()=>cv.classList.remove('hit'),150)},600);setTimeout(()=>{ov.classList.remove('active');this.startAtkTimer();if(this.mHp<=0)this.monK();else setTimeout(()=>{this.nextW();this.focusInput()},200)},1400)},
 
-  monK(){sfxKill();this.pHp=Math.min(this.pMaxHp,this.pHp+15);this.updatePHP();document.getElementById('m-canvas').classList.add('dead');spawnBoom(window.innerWidth/2,window.innerHeight*.25);this.mD++;const goldEarn=Math.floor(this.mon.xp*.6+Math.random()*5);this.p.gold+=goldEarn;this.stageGold+=goldEarn;this.updateGold();this.p.xp+=Math.floor(this.mon.xp*(1+this.p.level*.04));setTimeout(()=>{if(this.p.xp>=this.p.xpN)this.lvlUp();else if(this.wIS>=this.wPS)this.stageClear();else{this.spawnM();this.focusInput()}this.updateS()},600)},
+  monK(){sfxKill();this.pHp=Math.min(this.pMaxHp,this.pHp+15);this.updatePHP();document.getElementById('m-canvas').classList.add('dead');spawnBoom(window.innerWidth/2,window.innerHeight*.25);this.mD++;const goldEarn=Math.floor(this.mon.xp*.6+Math.random()*5);this.p.gold+=goldEarn;this.stageGold+=goldEarn;this.updateGold();this.p.xp+=Math.floor(this.mon.xp*(1+this.p.level*.04));setTimeout(()=>{if(this.p.xp>=this.p.xpN)this.lvlUp();else if(this.wIS>=this.getWPS())this.stageClear();else{this.spawnM();this.focusInput()}this.updateS()},600)},
 
   lvlUp(){this.stopAtkTimer();this.p.xp-=this.p.xpN;this.pMaxHp=80+this.p.level*10;this.pHp=Math.min(this.pMaxHp,this.pHp+20);this.p.level++;this.p.xpN=Math.floor(60*Math.pow(1.25,this.p.level-1));sfxLvl();spawnBoom(window.innerWidth/2,window.innerHeight/2);document.getElementById('lu-level').textContent=this.p.level;const rw=['ちからが みなぎる!','タイピングが はやくなった!','てきが おそれている!','つよさが ました!','でんせつに ちかづいた!'];document.getElementById('lu-reward').textContent=rw[Math.floor(Math.random()*rw.length)];this.save();this.showScreen('levelup-screen')},
 
-  continueBattle(){if(this.wIS>=this.wPS)this.stageClear();else{this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)}},
+  continueBattle(){if(this.wIS>=this.getWPS())this.stageClear();else{this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)}},
 
   stageClear(){this.stopAtkTimer();this.pHp=this.pMaxHp;this.updatePHP();const t=Math.floor((Date.now()-this.sS)/1000);const acc=this.sC>0?Math.round(((this.sC-this.sE)/this.sC)*100):100;const wpm=t>0?Math.round((this.sC/5)/(t/60)):0;const bonus=this.stage*15;this.p.gold+=bonus;this.stageGold+=bonus;this.updateGold();document.getElementById('stage-results').innerHTML=`<div class="result-item"><div class="label">たおした てき</div><div class="value">${this.mD}</div></div><div class="result-item"><div class="label">うった ことば</div><div class="value">${this.sW}</div></div><div class="result-item"><div class="label">せいかくさ</div><div class="value">${acc}%</div></div><div class="result-item"><div class="label">かせいだ ゴールド</div><div class="value">💰${this.stageGold}G</div></div>`;this.saveR(wpm,acc);this.save();this.showScreen('stageclear-screen')},
 
-  nextStage(){this.pHp=this.pMaxHp;this.updatePHP();this.stage=Math.min(this.stage+1,5);this.autoSave();this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.mD=0;this.stageGold=0;mI.value='';this.mOffset=0;this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)},
+  nextStage(){this.pHp=this.pMaxHp;this.updatePHP();this.stage=Math.min(this.stage+1,10);this.autoSave();this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.mD=0;this.stageGold=0;mI.value='';this.mOffset=0;this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)},
 
   updateHP(){const p=Math.max(0,(this.mHp/this.mMax)*100);const b=document.getElementById('m-hp');b.style.width=p+'%';b.className='hp-inner'+(p<15?' crit':p<35?' low':'');document.getElementById('m-hp-txt').textContent='HP '+this.mHp+'/'+this.mMax},
   updateCmb(d,w){const el=document.getElementById('combo-text');document.getElementById('s-wpm').textContent=w>0?w+'WPM':'';if(this.streak>=10){el.textContent='** ULTRA x'+this.streak+' -'+d;el.className='combo ultra'}else if(this.streak>=5){el.textContent='* COMBO x'+this.streak+' -'+d;el.className='combo fire'}else if(this.streak>=3){el.textContent=this.streak+'COMBO -'+d;el.className='combo'}else{el.textContent='-'+d+' DAMAGE';el.className='combo'}},
@@ -651,7 +793,7 @@ const Game={
     setTimeout(()=>{document.getElementById('shop-typing-area').classList.remove('active');this.shopTab(document.querySelector('.shop-tab.active').id.replace('tab-',''))},800);
   },
   openShopFromGameover(){this.pHp=Math.floor(this.pMaxHp*.3);this.updatePHP();this.openShop()},
-  shopToNext(){this.pHp=Math.min(this.pMaxHp,this.pHp);this.updatePHP();this.stage=Math.min(this.stage+1,5);this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.mD=0;this.stageGold=0;mI.value='';this.mOffset=0;this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)},
+  shopToNext(){this.pHp=Math.min(this.pMaxHp,this.pHp);this.updatePHP();this.stage=Math.min(this.stage+1,10);this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.mD=0;this.stageGold=0;mI.value='';this.mOffset=0;this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)},
 
   startAtkTimer(){this.stopAtkTimer();this.atkT=0;this.atkInt=setInterval(()=>{if(!document.querySelector('#battle-screen.active'))return;this.atkT+=0.1;this.updateAtkBar();if(this.atkT>=this.atkMax){this.resetAtk();this.monAttack()}},100)},
   stopAtkTimer(){if(this.atkInt){clearInterval(this.atkInt);this.atkInt=null}},
@@ -691,8 +833,8 @@ const Game={
   loadSlot(i){this.activeSlot=i;const slot=this.slots[i];if(slot&&slot.p){this.p=Object.assign({...PDEF},slot.p);if(!this.p.items)this.p.items={};this.stage=slot.stage||1}else{this.p={...PDEF};this.stage=1}},
   fmtPlayTime(s){if(!s||s<0)return'0:00';s=Math.floor(s);const h=Math.floor(s/3600);const m=Math.floor((s%3600)/60);return h>0?h+':'+String(m).padStart(2,'0')+'h':m+'ぷん'},
   fmtSaveDate(t){if(!t)return'';const d=new Date(t);return(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')},
-  getStageName(st){return['はじまりの もり','やまの どうくつ','うみの しんでん','ほのおの とう','まおうの しろ'][Math.min((st||1)-1,4)]},
-  renderSlots(){const g=document.getElementById('slot-grid');if(!g)return;g.innerHTML='';this.slots.forEach((sl,i)=>{const d=document.createElement('div');d.className='slot-card'+(i===this.activeSlot?' sel':'');d.onclick=()=>this.selectSlot(i);if(sl&&sl.p&&(sl.p.level>1||sl.p.wt>0||sl.p.gold>0)){const num=document.createElement('div');num.className='slot-num';num.textContent='SLOT '+(i+1);d.appendChild(num);const cv=document.createElement('canvas');cv.width=16;cv.height=16;cv.style.cssText='width:40px;height:40px;image-rendering:pixelated;image-rendering:crisp-edges;display:block;margin:0 auto';const cc={body:sl.p.ccBody??2,skin:sl.p.ccSkin||0,hair:sl.p.ccHairClr||0,look:sl.p.ccLook||0,hshape:sl.p.ccHShape||0};drawAvatar(cv,sl.p.weapon,sl.p.armor,cc);d.appendChild(cv);const nm=document.createElement('div');nm.className='slot-name';nm.textContent=sl.p.name||'???';d.appendChild(nm);const dt=document.createElement('div');dt.className='slot-detail';dt.textContent='Lv.'+sl.p.level+' 💰'+(sl.p.gold||0)+'G';d.appendChild(dt);const st=document.createElement('div');st.className='slot-detail';st.textContent='📍'+this.getStageName(sl.stage)+' ⏱'+this.fmtPlayTime(sl.p.playTime);d.appendChild(st);if(sl.p.lastSaved){const sv=document.createElement('div');sv.className='slot-detail';sv.style.color='#484858';sv.textContent=this.fmtSaveDate(sl.p.lastSaved);d.appendChild(sv)}const del=document.createElement('button');del.className='slot-del';del.textContent='✕';del.onclick=e=>{e.stopPropagation();this.deleteSlot(i)};d.appendChild(del)}else{d.innerHTML='<div class="slot-num">SLOT '+(i+1)+'</div><div class="slot-empty">からっぽ</div>'}g.appendChild(d)});document.getElementById('slot-select').style.display='';document.getElementById('slot-actions').style.display='none'},
+  getStageName(st){return['はじまりの もり','やまの どうくつ','うみの しんでん','ほのおの とう','まおうの しろ','てんくうの しま','こおりの きょうこく','やみの じゅかい','ほしの しんでん','しんかいの おうきゅう'][Math.min((st||1)-1,9)]},
+  renderSlots(){const g=document.getElementById('slot-grid');if(!g)return;g.innerHTML='';this.slots.forEach((sl,i)=>{const d=document.createElement('div');d.className='slot-card'+(i===this.activeSlot?' sel':'');d.onclick=()=>this.selectSlot(i);if(sl&&sl.p&&(sl.p.level>1||sl.p.wt>0||sl.p.gold>0)){const num=document.createElement('div');num.className='slot-num';num.textContent='SLOT '+(i+1);d.appendChild(num);const cv=document.createElement('canvas');cv.width=32;cv.height=32;cv.style.cssText='width:48px;height:48px;image-rendering:pixelated;image-rendering:crisp-edges;display:block;margin:0 auto';const cc={body:sl.p.ccBody??2,skin:sl.p.ccSkin||0,hair:sl.p.ccHairClr||0,look:sl.p.ccLook||0,hshape:sl.p.ccHShape||0};drawAvatar(cv,sl.p.weapon,sl.p.armor,cc);d.appendChild(cv);const nm=document.createElement('div');nm.className='slot-name';nm.textContent=sl.p.name||'???';d.appendChild(nm);const dt=document.createElement('div');dt.className='slot-detail';dt.textContent='Lv.'+sl.p.level+' 💰'+(sl.p.gold||0)+'G';d.appendChild(dt);const st=document.createElement('div');st.className='slot-detail';st.textContent='📍'+this.getStageName(sl.stage)+' ⏱'+this.fmtPlayTime(sl.p.playTime);d.appendChild(st);if(sl.p.lastSaved){const sv=document.createElement('div');sv.className='slot-detail';sv.style.color='#484858';sv.textContent=this.fmtSaveDate(sl.p.lastSaved);d.appendChild(sv)}const del=document.createElement('button');del.className='slot-del';del.textContent='✕';del.onclick=e=>{e.stopPropagation();this.deleteSlot(i)};d.appendChild(del)}else{d.innerHTML='<div class="slot-num">SLOT '+(i+1)+'</div><div class="slot-empty">からっぽ</div>'}g.appendChild(d)});document.getElementById('slot-select').style.display='';document.getElementById('slot-actions').style.display='none'},
   selectSlot(i){this.activeSlot=i;this.loadSlot(i);document.querySelectorAll('.slot-card').forEach((c,j)=>{c.classList.toggle('sel',j===i)});document.getElementById('slot-select').style.display='none';document.getElementById('slot-actions').style.display='';document.getElementById('player-name').value=this.p.name;this.updateTitleBtns()},
   deleteSlot(i){const sl=this.slots[i];if(!sl)return;if(!confirm('スロット'+(i+1)+'の データを けす？'))return;this.slots[i]=null;localStorage.setItem('tq_slots',JSON.stringify(this.slots));if(i===this.activeSlot){this.p={...PDEF};this.stage=1}this.renderSlots()},
   backToSlots(){this.renderSlots()},
