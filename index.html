@@ -684,7 +684,13 @@ case 0:drawCap(4,2);drawSides(10,4);drawBangs('side');break;
 case 1:drawCap(2,0);break;
 case 2:drawCap(4,2);drawSides(10,4);drawBangs('split');c.fillStyle=HD;rect(cx-1,htop+1,2,4,HD);break;
 case 3:drawCap(3,1);drawSides(6,3);drawBangs('side');c.fillStyle=HM;for(let i=-4;i<=4;i++){const sx=cx+i*4,sy=htop-14+Math.abs(i)*2;const h=Math.max(2,htop+4-sy);rect(sx,sy,3,h,HM);rect(sx+1,sy,1,Math.max(1,h-2),HL)};break;
-case 4:drawCap(8,7);for(let dy=-2;dy<headRY+2;dy++){const aw=headRX+6-Math.abs(dy)*0.3;if(aw>headRX+1){rect(cx-Math.floor(aw),headCY-headRY+dy,Math.floor(aw)-headRX,1,dy%2?HM:HD);rect(cx+headRX+1,headCY-headRY+dy,Math.floor(aw)-headRX,1,dy%2?HM:HD)}};drawBangs('full');break;
+case 4:/* afro - big round puff around head, face visible */
+{const ar=headRX+6,ary=headRY+5;
+for(let dy=-ary;dy<=ary;dy++){const ow=Math.round(ar*Math.sqrt(Math.max(0,1-(dy*dy)/(ary*ary))));const iw=(dy>-headRY&&dy<headRY)?Math.round(headRX*Math.sqrt(Math.max(0,1-(dy*dy)/(headRY*headRY)))):0;
+if(ow>iw+1){c.fillStyle=(dy+ary)%3===0?HD:HM;c.fillRect(cx-ow,headCY+dy,ow-iw,1);c.fillRect(cx+iw+1,headCY+dy,ow-iw,1)}
+if(dy<=-headRY&&ow>0){c.fillStyle=dy%2?HD:HM;c.fillRect(cx-ow,headCY+dy,ow*2+1,1)}}
+c.fillStyle=HL;for(let dy=-ary;dy<-ary+3;dy++){const ow=Math.round((ar-2)*Math.sqrt(Math.max(0,1-(dy*dy)/(ary*ary))));if(ow>2)c.fillRect(cx-Math.floor(ow*0.4),headCY+dy,Math.floor(ow*0.6),1)}
+};break;
 case 5:drawCap(4,4);drawSides(16,5);drawBangs('full');break;
 case 6:drawCap(4,2);drawSides(12,4);drawBangs('side');break;
 case 7:drawCap(4,2);drawSides(6,4);drawBangs('side');break;
