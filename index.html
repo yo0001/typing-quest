@@ -186,8 +186,8 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 .potion-btn{font-family:'Press Start 2P','DotGothic16',monospace;font-size:7px;padding:4px 8px;cursor:pointer;border:2px solid var(--green);background:#103010;color:var(--green);margin-left:4px}
 .potion-btn:active{background:#205020}
 .potion-btn.empty{opacity:.3;cursor:default;border-color:#303048;color:#303048}
-.avatar-preview{image-rendering:pixelated;image-rendering:crisp-edges;width:192px;height:192px;margin:6px auto;border:3px solid #484858;background:#000010}
-.avatar-mini{image-rendering:pixelated;image-rendering:crisp-edges;width:80px;height:80px;animation:avBreathe 3s ease-in-out infinite}
+.avatar-preview{image-rendering:pixelated;image-rendering:crisp-edges;width:256px;height:256px;margin:6px auto;border:3px solid #484858;background:#000010}
+.avatar-mini{image-rendering:pixelated;image-rendering:crisp-edges;width:96px;height:96px;animation:avBreathe 3s ease-in-out infinite}
 @keyframes avBreathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.02)}}
 .avatar-battle{display:flex;align-items:center;justify-content:center;gap:16px;margin:2px 0}
 .vs-label{font-size:10px;color:var(--red);text-shadow:1px 1px 0 #000}
@@ -332,7 +332,7 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 <div id="cc-screen" class="screen">
   <div class="panel" style="max-width:420px">
     <h2>🎨 キャラメイク</h2>
-    <canvas id="cc-preview" width="128" height="128" style="width:192px;height:192px;margin:8px auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges"></canvas>
+    <canvas id="cc-preview" width="128" height="128" style="width:256px;height:256px;margin:8px auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges"></canvas>
     <div class="cc-row"><span class="cc-label">たいかく</span><div id="cc-body-opts" style="flex-wrap:wrap"></div></div>
     <div class="cc-row"><span class="cc-label">はだ</span><div id="cc-skin-opts"></div></div>
     <div class="cc-row"><span class="cc-label">ようし</span><div id="cc-look-opts"></div></div>
@@ -536,7 +536,8 @@ const CC_PROPS=[
 {h:2,bw:26,bh:20,lh:10},{h:2,bw:22,bh:20,lh:10,sk:1},{h:1,bw:20,bh:18,lh:10,hu:1},{h:1,bw:18,bh:18,lh:10,sk:1,hu:1}];
 function drawAvatar(cv,wpn,arm,cc){
 const c=cv.getContext('2d');cv.width=128;cv.height=128;c.clearRect(0,0,128,128);
-c.imageSmoothingEnabled=false;c.save();c.scale(2,2);
+c.imageSmoothingEnabled=false;
+const S=2,_fr=c.fillRect.bind(c);c.fillRect=(x,y,w,h)=>_fr(x*S,y*S,w*S,h*S);
 const bi=cc?(cc.body??2):2;const pr=CC_PROPS[bi]||CC_PROPS[2];
 const sk=cc?CC_SKIN[cc.skin]||CC_SKIN[0]:CC_SKIN[0];
 const hc=cc?CC_HCLR[cc.hair]||CC_HCLR[0]:CC_HCLR[0];
@@ -571,7 +572,7 @@ if(ponyBack){rect(cx-4,headCY+headRY,9,Math.min(24,shoeY-(headCY+headRY)+2),HM);
 if(hs===7||hs===29){rect(cx-headRX-5,headCY+4,7,Math.min(28,shoeY-headCY),HM);rect(cx+headRX-1,headCY+4,7,Math.min(28,shoeY-headCY),HM);rect(cx-headRX-3,headCY+6,4,Math.min(24,shoeY-headCY-2),HD);rect(cx+headRX+1,headCY+6,4,Math.min(24,shoeY-headCY-2),HD)}
 if(hs===19){rect(cx-headRX-4,headCY+4,5,Math.min(24,shoeY-headCY),HM);rect(cx+headRX,headCY+4,5,Math.min(24,shoeY-headCY),HM)}
 /* foot shadow */
-c.fillStyle='rgba(0,0,0,0.08)';c.beginPath();c.ellipse(cx,shoeY+3,Math.floor(pr.bw*0.6),2,0,0,Math.PI*2);c.fill();
+c.fillStyle='rgba(0,0,0,0.08)';c.beginPath();c.ellipse(cx*S,(shoeY+3)*S,Math.floor(pr.bw*0.6)*S,2*S,0,0,Math.PI*2);c.fill();
 /* legs */
 const legW=Math.max(4,Math.floor(pr.bw*0.28));const legGap=2;
 rect(cx-legGap-legW,legY,legW,pr.lh,CD);rect(cx+legGap+1,legY,legW,pr.lh,CD);
@@ -722,8 +723,18 @@ rect(bx+2,beltY,pr.bw-4,2,ac2[1]);rect(cx-1,beltY,3,2,ac2[3]||ac2[0]);
 rect(cx,bodyY+3,1,pr.bh-4,ac2[3]||ac2[0]);
 rect(bx-4,bodyY+2,4,pr.bh-3,ac2[0]);rect(bx+pr.bw,bodyY+2,4,pr.bh-3,ac2[0]);
 rect(bx-4,bodyY+2,1,pr.bh-3,'rgba(255,255,255,0.1)');rect(bx+pr.bw+3,bodyY+2,1,pr.bh-3,'rgba(0,0,0,0.08)')}
-c.restore();/* ===== 128x128 POST-PROCESSING ===== */
+/* Restore native fillRect for post-processing */
+c.fillRect=_fr;
+/* ===== NATIVE 128x128 FINE DETAIL ===== */
 _ppAvatar(c,128);
+/* Extra 1px detail: hair shine line */
+const _hcy=(headCY-headRY)*S;
+c.fillStyle='rgba(255,255,255,0.08)';
+for(let dy=2;dy<headRY*S;dy++){const w=Math.round((headRX-1)*S*Math.sqrt(Math.max(0,1-(dy*dy)/((headRY*S)*(headRY*S)))));if(w>2)_fr(cx*S-Math.floor(w*0.4),_hcy+dy,Math.floor(w*0.3),1)}
+/* Eye sparkle at native res */
+c.fillStyle='rgba(255,255,255,0.5)';
+const _eyr=(headCY+1)*S;
+_fr(cx*S-9*S+S,_eyr+S,1,1);_fr(cx*S+5*S+S,_eyr+S,1,1);
 }
 
 const SHOP_ARMOR=[
@@ -941,7 +952,7 @@ const Game={
       }
     }
     initA();const cc={ccBody:this.p.ccBody??2,ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccLook:this.p.ccLook||0,ccHShape:this.p.ccHShape||0,ccEye:this.p.ccEye||0,ccBrow:this.p.ccBrow||0,ccFace:this.p.ccFace||0,ccEclr:this.p.ccEclr||0};this.p={...PDEF,name:document.getElementById('player-name').value.trim()||'ゆうしゃ',...cc,playTime:0,lastSaved:Date.now()};this.stage=1;this.save();this.startAdventure()},
-  updateTitleBtns(){const el=document.getElementById('title-buttons');if(!el)return;const hasSave=this.p.level>1||this.p.wt>0;if(hasSave){el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="128" height="128" style="width:128px;height:128px;margin:4px auto"></canvas><button class="btn btn-green" onclick="Game.startAdventure()">つづきから (Lv'+this.p.level+' 💰'+this.p.gold+'G)</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.newGame()">はじめから</button> <button class="btn btn-small" style="margin-top:5px" onclick="Game.openCC()">🎨 キャラメイク</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor,this.getCC())}else{el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="128" height="128" style="width:192px;height:192px;margin:6px auto;display:block"></canvas><button class="btn btn-green" style="margin-top:5px" onclick="Game.openCC()">🎨 みためを きめよう!</button><br><button class="btn btn-green" style="margin-top:5px" onclick="Game.startAdventure()">ぼうけんに でる</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor,this.getCC())}},
+  updateTitleBtns(){const el=document.getElementById('title-buttons');if(!el)return;const hasSave=this.p.level>1||this.p.wt>0;if(hasSave){el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="128" height="128" style="width:192px;height:192px;margin:4px auto"></canvas><button class="btn btn-green" onclick="Game.startAdventure()">つづきから (Lv'+this.p.level+' 💰'+this.p.gold+'G)</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.newGame()">はじめから</button> <button class="btn btn-small" style="margin-top:5px" onclick="Game.openCC()">🎨 キャラメイク</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor,this.getCC())}else{el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="128" height="128" style="width:256px;height:256px;margin:6px auto;display:block"></canvas><button class="btn btn-green" style="margin-top:5px" onclick="Game.openCC()">🎨 みためを きめよう!</button><br><button class="btn btn-green" style="margin-top:5px" onclick="Game.startAdventure()">ぼうけんに でる</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor,this.getCC())}},
 
   openCC(){this._ccBak={ccBody:this.p.ccBody??2,ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccLook:this.p.ccLook||0,ccHShape:this.p.ccHShape||0,ccEye:this.p.ccEye||0,ccBrow:this.p.ccBrow||0,ccFace:this.p.ccFace||0,ccEclr:this.p.ccEclr||0};this.renderCCOpts();this.refreshCCPreview();this.showScreen('cc-screen')},
   renderCCOpts(){const mk=(id,arr,cur,fn,mode)=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='';arr.forEach((v,i)=>{if(mode==='swatch'){const d=document.createElement('div');d.className='cc-swatch'+(i===cur?' sel':'');d.style.background=typeof v==='string'?v:v[0];d.onclick=()=>fn(i);el.appendChild(d)}else{const b=document.createElement('button');b.className='cc-hair-btn'+(i===cur?' sel':'');b.textContent=v;b.onclick=()=>fn(i);el.appendChild(b)}})};mk('cc-body-opts',CC_BNAME,this.p.ccBody??2,i=>{this.p.ccBody=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-skin-opts',CC_SKIN.map(s=>s[0]),this.p.ccSkin||0,i=>{this.p.ccSkin=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-look-opts',CC_LNAME,this.p.ccLook||0,i=>{this.p.ccLook=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-hair-opts',CC_HNAME,this.p.ccHShape||0,i=>{this.p.ccHShape=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-hclr-opts',CC_HCLR.map(h=>h[0]),this.p.ccHairClr||0,i=>{this.p.ccHairClr=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-face-opts',CC_FNAME,this.p.ccFace||0,i=>{this.p.ccFace=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-eye-opts',CC_ENAME,this.p.ccEye||0,i=>{this.p.ccEye=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-eclr-opts',CC_ECLR.map(e=>e[0]),this.p.ccEclr||0,i=>{this.p.ccEclr=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-brow-opts',CC_BWNAME,this.p.ccBrow||0,i=>{this.p.ccBrow=i;this.renderCCOpts();this.refreshCCPreview()},'btn')},
