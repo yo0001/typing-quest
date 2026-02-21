@@ -25,6 +25,15 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 .btn-small{font-size:8px;padding:8px 12px}
 .name-input{font-family:'Press Start 2P','DotGothic16',monospace;font-size:16px;padding:10px 14px;background:#000010;border:3px solid var(--gold);color:var(--gold);text-align:center;width:240px;outline:none;margin:8px 0;box-shadow:inset 2px 2px 0 #000}
 .name-input::placeholder{color:rgba(208,168,32,0.25)}.name-input:focus{border-color:#e8c840}
+/* CC screen */
+.cc-row{display:flex;align-items:center;justify-content:center;gap:6px;margin:6px 0;flex-wrap:wrap}
+.cc-label{font-size:8px;color:var(--gold);min-width:60px;text-align:right}
+.cc-swatch{width:28px;height:28px;border:3px solid #484858;cursor:pointer;display:inline-block}
+.cc-swatch:hover{border-color:#f0f0e0}
+.cc-swatch.sel{border-color:var(--gold);box-shadow:0 0 6px var(--gold)}
+.cc-hair-btn{font-family:'Press Start 2P',monospace;font-size:7px;padding:4px 8px;border:3px solid #484858;background:#101020;color:var(--txt);cursor:pointer}
+.cc-hair-btn:hover{border-color:#f0f0e0}
+.cc-hair-btn.sel{border-color:var(--gold);color:var(--gold)}
 /* Pixel icon inline */
 .pxi{display:inline-block;vertical-align:middle;image-rendering:pixelated;image-rendering:crisp-edges}
 .mon-canvas{image-rendering:pixelated;image-rendering:crisp-edges;width:80px;height:80px;margin:0 auto 4px}
@@ -294,6 +303,21 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
     <button class="btn btn-small" onclick="Game.backToTitle()">タイトルへ</button>
   </div>
 </div>
+<!-- CHARACTER CREATOR -->
+<div id="cc-screen" class="screen">
+  <div class="panel" style="max-width:420px">
+    <h2>🎨 キャラメイク</h2>
+    <canvas id="cc-preview" width="16" height="16" style="width:96px;height:96px;margin:8px auto;display:block;image-rendering:pixelated;image-rendering:crisp-edges"></canvas>
+    <div class="cc-row"><span class="cc-label">はだ</span><div id="cc-skin-opts"></div></div>
+    <div class="cc-row"><span class="cc-label">かみがた</span><div id="cc-hair-opts"></div></div>
+    <div class="cc-row"><span class="cc-label">かみいろ</span><div id="cc-hclr-opts"></div></div>
+    <div class="cc-row"><span class="cc-label">ふく</span><div id="cc-style-opts"></div></div>
+    <div style="margin-top:10px">
+      <button class="btn btn-green btn-small" onclick="Game.confirmCC()">けってい</button>
+      <button class="btn btn-small" onclick="Game.cancelCC()">もどる</button>
+    </div>
+  </div>
+</div>
 <!-- FREE TYPING -->
 <div id="free-screen" class="screen">
   <div class="panel" style="max-width:460px">
@@ -425,7 +449,12 @@ const AVT_BASE={c:['','#805030','#604020','#e0b080','#c09060','#203880','#d8d8d0
 d:['0000012200000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0013343310000000','0001111100000000','0000696000000000','0006666600000000','0036666300000000','0006966600000000','0000777000000000','0000707000000000','0000808000000000','0000000000000000']};
 const ARM_CLR={'':['#d8d8d0','#3060c0','#604020','#f0f0e0'],a1:['#a07040','#806030','#604020','#c09060'],a2:['#808890','#607078','#505860','#a0a8b0'],a3:['#6040c0','#4838a0','#383080','#8060e0'],a4:['#d0a820','#b09018','#806010','#f0d040']};
 const WPN_PX={w1:{c:'#805030',px:[[10,4],[10,5],[11,6],[11,7],[12,8],[12,9]]},w2:{c:'#a0a0a8',px:[[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w3:{c:'#c0c8d0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w4:{c:'#5080e0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,3,'#80c0f0'],[11,3,'#80c0f0']]},w5:{c:'#d0a820',px:[[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,2,'#f0d840'],[11,2,'#f0d840'],[9,4,'#f0d840'],[11,4,'#f0d840']]}};
-function drawAvatar(cv,wpn,arm){const c=cv.getContext('2d');cv.width=16;cv.height=16;c.clearRect(0,0,16,16);const ac=ARM_CLR[arm||'']||ARM_CLR[''];const palette=[null,'#805030','#604020','#e0b080','#c09060','#203880',ac[0],ac[1],ac[2],ac[3]];for(let y=0;y<16;y++)for(let x=0;x<AVT_BASE.d[y].length;x++){const i=parseInt(AVT_BASE.d[y][x]);if(i>0&&palette[i]){c.fillStyle=palette[i];c.fillRect(x,y,1,1)}}const wp=WPN_PX[wpn];if(wp)wp.px.forEach(p=>{c.fillStyle=p[2]||wp.c;c.fillRect(p[0],p[1],1,1)})}
+const CC_SKIN=[['#e0b080','#c09060'],['#f0d0a0','#d0b080'],['#8b5e3c','#6b4226']];
+const CC_HCLR=[['#805030','#604020'],['#202020','#101010'],['#d0a030','#b08020'],['#c03020','#901810'],['#3050b0','#203080'],['#e0e0e0','#b0b0b0'],['#d050a0','#a03878'],['#30a050','#207038']];
+const CC_STYLE=[['#d8d8d0','#3060c0','#604020','#f0f0e0'],['#c03030','#802020','#302020','#e06060'],['#30a050','#206838','#203020','#60c080'],['#d0a820','#b08818','#604020','#f0d840'],['#6040c0','#4030a0','#282060','#9070e0']];
+const CC_HSHAPE=[null,['0000000000000000','0000111000000000','0011111110000000'],['0001120000000000','0011111100000000','0111111110000000'],['0001020100000000','0101111101000000','0011111110000000'],['0011111110000000','0111111111000000','1111111111100000'],['0000221000000000','0001111100000000','0011111110000000'],['0000012200000000','0001111120000000','0011111112000000'],['0110012200110000','0011111100110000','0011111110000000']];
+const CC_HNAME=['ふつう','ボウズ','わけめ','ツンツン','アフロ','おかっぱ','ながめ','ツインテ'];
+function drawAvatar(cv,wpn,arm,cc){const c=cv.getContext('2d');cv.width=16;cv.height=16;c.clearRect(0,0,16,16);const sk=cc?CC_SKIN[cc.skin]||CC_SKIN[0]:CC_SKIN[0];const hc=cc?CC_HCLR[cc.hair]||CC_HCLR[0]:CC_HCLR[0];const ac=ARM_CLR[arm||'']||ARM_CLR[''];const st=(!arm&&cc)?CC_STYLE[cc.style]||CC_STYLE[0]:ac;const palette=[null,hc[0],hc[1],sk[0],sk[1],'#203880',st[0],st[1],st[2],st[3]];const hs=cc?CC_HSHAPE[cc.hshape]||null:null;for(let y=0;y<16;y++){const row=(hs&&y<3)?hs[y]:AVT_BASE.d[y];for(let x=0;x<row.length;x++){const i=parseInt(row[x]);if(i>0&&palette[i]){c.fillStyle=palette[i];c.fillRect(x,y,1,1)}}}const wp=WPN_PX[wpn];if(wp)wp.px.forEach(p=>{c.fillStyle=p[2]||wp.c;c.fillRect(p[0],p[1],1,1)})}
 
 const SHOP_ARMOR=[
   {id:'a1',name:'かわのふく',desc:'ぼうぎょ+2',def:2,cost:40},
@@ -533,7 +562,8 @@ const Game={
   updatePotionBtn(){const btn=document.getElementById('potion-btn');if(!btn)return;const tot=Object.values(this.p.items).reduce((a,b)=>a+b,0);btn.textContent='💊'+tot;btn.className=tot>0?'potion-btn':'potion-btn empty'},
   usePotion(){const items=this.p.items;const keys=['i1','i2','i3'];let used=null;for(const k of keys){if(items[k]&&items[k]>0){used=k;break}}if(!used)return;const it=[...SHOP_ITEMS].find(i=>i.id===used);if(!it)return;items[used]--;if(items[used]<=0)delete items[used];const heal=it.heal>=9999?this.pMaxHp:it.heal;this.pHp=Math.min(this.pMaxHp,this.pHp+heal);sfxPotion();spawnP(window.innerWidth/2,window.innerHeight*.6,'#30d030',8);this.updatePHP();this.updatePotionBtn();this.save()},
 
-  refreshAvatar(){const b=document.getElementById('avatar-battle');if(b)drawAvatar(b,this.p.weapon,this.p.armor);const s=document.getElementById('avatar-shop');if(s)drawAvatar(s,this.p.weapon,this.p.armor)},
+  getCC(){return{skin:this.p.ccSkin||0,hair:this.p.ccHairClr||0,style:this.p.ccStyle||0,hshape:this.p.ccHShape||0}},
+  refreshAvatar(){const cc=this.getCC();const b=document.getElementById('avatar-battle');if(b)drawAvatar(b,this.p.weapon,this.p.armor,cc);const s=document.getElementById('avatar-shop');if(s)drawAvatar(s,this.p.weapon,this.p.armor,cc)},
 
   /* ===== SHOP ===== */
   openShop(){this.stageGold=0;document.getElementById('shop-gold').textContent='💰 '+this.p.gold+'G';this.shopBuying=null;document.getElementById('shop-typing-area').classList.remove('active');document.getElementById('discount-msg').textContent='';this.refreshAvatar();this.shopTab('inn');this.showScreen('shop-screen')},
@@ -595,11 +625,16 @@ const Game={
   updatePHP(){const el=document.getElementById('s-php');if(!el)return;el.textContent=this.pHp;const pct=this.pHp/this.pMaxHp;el.className='php-txt'+(pct<0.15?' crit':pct<0.35?' low':'')},
   gameOver(){this.stopAtkTimer();sfxBad();setTimeout(()=>sfxBad(),100);setTimeout(()=>snd(80,.3,'sawtooth'),200);const acc=this.sC>0?Math.round(((this.sC-this.sE)/this.sC)*100):100;document.getElementById('gameover-results').innerHTML='<div class="result-item"><div class="label">STAGE</div><div class="value">'+this.stage+'</div></div><div class="result-item"><div class="label">たおした てき</div><div class="value">'+this.mD+'</div></div><div class="result-item"><div class="label">うった ことば</div><div class="value">'+this.sW+'</div></div><div class="result-item"><div class="label">せいかくさ</div><div class="value">'+acc+'%</div></div>';this.save();this.showScreen('gameover-screen')},
   retryBattle(){this.pHp=this.pMaxHp;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;mI.value='';this.mOffset=0;this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();this.updatePHP();this.updateS();setTimeout(()=>this.focusInput(),200)},
-  newGame(){initA();this.p={name:this.p.name||document.getElementById('player-name').value.trim()||'ゆうしゃ',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',armor:'',def:0,items:{}};this.stage=1;this.save();this.startAdventure()},
-  updateTitleBtns(){const el=document.getElementById('title-buttons');if(!el)return;const hasSave=this.p.level>1||this.p.wt>0;if(hasSave){const wpn=this.p.weapon?SHOP_WEAPONS.find(w=>w.id===this.p.weapon):null;const arm=this.p.armor?SHOP_ARMOR.find(a=>a.id===this.p.armor):null;el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="16" height="16" style="width:64px;height:64px;margin:4px auto"></canvas><button class="btn btn-green" onclick="Game.startAdventure()">つづきから (Lv'+this.p.level+' 💰'+this.p.gold+'G)</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.newGame()">はじめから</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor)}else{el.innerHTML='<button class="btn btn-green" onclick="Game.startAdventure()">ぼうけんに でる</button>'}},
+  newGame(){initA();const cc={ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccStyle:this.p.ccStyle||0,ccHShape:this.p.ccHShape||0};this.p={name:this.p.name||document.getElementById('player-name').value.trim()||'ゆうしゃ',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',armor:'',def:0,items:{},...cc};this.stage=1;this.save();this.startAdventure()},
+  updateTitleBtns(){const el=document.getElementById('title-buttons');if(!el)return;const hasSave=this.p.level>1||this.p.wt>0;if(hasSave){el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="16" height="16" style="width:64px;height:64px;margin:4px auto"></canvas><button class="btn btn-green" onclick="Game.startAdventure()">つづきから (Lv'+this.p.level+' 💰'+this.p.gold+'G)</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.newGame()">はじめから</button> <button class="btn btn-small" style="margin-top:5px" onclick="Game.openCC()">🎨 キャラメイク</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor,this.getCC())}else{el.innerHTML='<button class="btn btn-green" onclick="Game.startAdventure()">ぼうけんに でる</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.openCC()">🎨 キャラメイク</button>'}},
 
+  openCC(){this._ccBak={ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccStyle:this.p.ccStyle||0,ccHShape:this.p.ccHShape||0};this.renderCCOpts();this.refreshCCPreview();this.showScreen('cc-screen')},
+  renderCCOpts(){const mk=(id,arr,cur,fn,mode)=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='';arr.forEach((v,i)=>{if(mode==='swatch'){const d=document.createElement('div');d.className='cc-swatch'+(i===cur?' sel':'');d.style.background=typeof v==='string'?v:v[0];d.onclick=()=>fn(i);el.appendChild(d)}else{const b=document.createElement('button');b.className='cc-hair-btn'+(i===cur?' sel':'');b.textContent=v;b.onclick=()=>fn(i);el.appendChild(b)}})};mk('cc-skin-opts',CC_SKIN.map(s=>s[0]),this.p.ccSkin||0,i=>{this.p.ccSkin=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-hclr-opts',CC_HCLR.map(h=>h[0]),this.p.ccHairClr||0,i=>{this.p.ccHairClr=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-style-opts',CC_STYLE.map(s=>s[0]),this.p.ccStyle||0,i=>{this.p.ccStyle=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-hair-opts',CC_HNAME,this.p.ccHShape||0,i=>{this.p.ccHShape=i;this.renderCCOpts();this.refreshCCPreview()},'btn')},
+  refreshCCPreview(){const cv=document.getElementById('cc-preview');if(cv)drawAvatar(cv,this.p.weapon,this.p.armor,this.getCC())},
+  confirmCC(){this.save();this.updateTitleBtns();this.showScreen('title-screen')},
+  cancelCC(){Object.assign(this.p,this._ccBak);this.updateTitleBtns();this.showScreen('title-screen')},
   save(){localStorage.setItem('tq_p',JSON.stringify(this.p));localStorage.setItem('tq_s',this.stage)},
-  load(){const s=localStorage.getItem('tq_p');if(s){const d=JSON.parse(s);this.p=Object.assign({gold:0,atk:0,weapon:'',armor:'',def:0,items:{}},d);if(!this.p.items)this.p.items={}}const t=localStorage.getItem('tq_s');if(t)this.stage=parseInt(t)},
+  load(){const s=localStorage.getItem('tq_p');if(s){const d=JSON.parse(s);this.p=Object.assign({gold:0,atk:0,weapon:'',armor:'',def:0,items:{},ccSkin:0,ccHairClr:0,ccStyle:0,ccHShape:0},d);if(!this.p.items)this.p.items={}}const t=localStorage.getItem('tq_s');if(t)this.stage=parseInt(t)},
   saveR(w,a){let r=JSON.parse(localStorage.getItem('tq_r')||'[]');r.push({n:this.p.name,l:this.p.level,w,a,s:this.stage,d:new Date().toLocaleDateString('ja-JP')});r.sort((a,b)=>b.w-a.w);r=r.slice(0,20);localStorage.setItem('tq_r',JSON.stringify(r))},
   renderR(){const r=JSON.parse(localStorage.getItem('tq_r')||'[]');const el=document.getElementById('ranking-list');if(!r.length){el.innerHTML='<p style="font-size:8px;color:#606070;text-align:center">まだ データが ないよ</p>';return}el.innerHTML=r.map((e,i)=>`<div class="rank-entry${e.n===this.p.name?' mine':''}"><span class="rank">${i<3?['1st','2nd','3rd'][i]:(i+1)+'.'}</span><span class="rname">${e.n} Lv${e.l}</span><span class="rscore">${e.w}WPM ${e.a}%</span></div>`).join('')},
   updateV(){let c=parseInt(localStorage.getItem('tq_v')||'0');const lv=localStorage.getItem('tq_lv'),td=new Date().toDateString();if(lv!==td){c++;localStorage.setItem('tq_v',c);localStorage.setItem('tq_lv',td)}document.getElementById('visitor-count').textContent='VISITORS: '+c},
