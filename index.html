@@ -371,7 +371,7 @@ const Game={
   word:'',chars:[],cur:0,hasErr:false,
   streak:0,wS:0,sS:0,sW:0,sC:0,sE:0,wIS:0,wPS:10,mBuf:'',composing:false,mOffset:0,wBag:[],wBagS:0,
 
-  init(){
+  init(){try{
     this.load();document.getElementById('player-name').value=this.p.name;
     buildKB();this.updateV();initIcons();
     document.getElementById('player-name').addEventListener('keydown',e=>{if(e.key==='Enter')this.startAdventure()});
@@ -381,13 +381,13 @@ const Game={
     mI.addEventListener('focus',()=>{setTimeout(()=>window.scrollTo(0,0),50);setTimeout(()=>window.scrollTo(0,0),150);setTimeout(()=>window.scrollTo(0,0),300)})}
     if(!isMobile){const pnl=document.querySelector('#battle-screen .panel');const hnt=document.getElementById('typing-hint');pnl.insertBefore(mI,hnt);mI.style.display='none';mI.placeholder='ここに うってね';mI.addEventListener('compositionstart',()=>{this.composing=true});mI.addEventListener('compositionend',()=>{this.composing=false;this.updateMD();this.checkMC()});mI.addEventListener('input',e=>{if(!this.composing&&!e.isComposing){this.updateMD();this.checkMC()}})}
     this.updateTitleBtns();
-  },
+  }catch(e){alert('Init error: '+e.message);console.error(e)}},
 
   focusInput(){const s=this.stage;if(s===1){mI.setAttribute('inputmode','latin');mI.setAttribute('lang','en');if(!isMobile){mI.classList.remove('pc-ime');mI.style.display='none';document.getElementById('keyboard').style.display=''}}else{mI.removeAttribute('inputmode');mI.setAttribute('lang','ja');if(!isMobile){mI.classList.add('pc-ime');mI.style.display='';document.getElementById('keyboard').style.display='none'}}this.mDL=0;mI.value='';this.mOffset=0;mI.focus()},
 
   showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='ranking-screen')this.renderR();if(id==='free-screen')setTimeout(()=>document.getElementById('free-input').focus(),50)},
 
-  startAdventure(){initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=7?3:this.p.level<=10?4:5;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;this.pMaxHp=80+this.p.level*10;this.pHp=this.pMaxHp;mI.value='';this.mOffset=0;this.spawnM();this.showScreen('battle-screen');this.updateS();this.updatePHP();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)},
+  startAdventure(){try{initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=7?3:this.p.level<=10?4:5;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;this.pMaxHp=80+this.p.level*10;this.pHp=this.pMaxHp;mI.value='';this.mOffset=0;this.spawnM();this.showScreen('battle-screen');this.updateS();this.updatePHP();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)}catch(e){alert('Error: '+e.message);console.error(e)}},
 
   backToTitle(){this.stopAtkTimer();this.save();this.updateTitleBtns();this.showScreen('title-screen')},
 
