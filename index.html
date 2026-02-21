@@ -338,6 +338,10 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
     <div class="cc-row"><span class="cc-label">ようし</span><div id="cc-look-opts"></div></div>
     <div class="cc-row"><span class="cc-label">かみがた</span><div id="cc-hair-opts" style="max-height:110px;overflow-y:auto;flex-wrap:wrap"></div></div>
     <div class="cc-row"><span class="cc-label">かみいろ</span><div id="cc-hclr-opts"></div></div>
+    <div class="cc-row"><span class="cc-label">かおがた</span><div id="cc-face-opts"></div></div>
+    <div class="cc-row"><span class="cc-label">めのかたち</span><div id="cc-eye-opts" style="flex-wrap:wrap"></div></div>
+    <div class="cc-row"><span class="cc-label">ひとみいろ</span><div id="cc-eclr-opts"></div></div>
+    <div class="cc-row"><span class="cc-label">まゆげ</span><div id="cc-brow-opts"></div></div>
     <div style="margin-top:10px">
       <button class="btn btn-green btn-small" onclick="Game.confirmCC()">けってい</button>
       <button class="btn btn-small" onclick="Game.cancelCC()">もどる</button>
@@ -520,6 +524,12 @@ const CC_HCLR=[['#805030','#604020'],['#202020','#101010'],['#d0a030','#b08020']
 const CC_LOOK=[['#808888','#606868','#484848','#989898'],['#3060c0','#2050a0','#404060','#5080e0'],['#c03040','#a02030','#d0a020','#e06070']];
 const CC_LNAME=['じみ','スタイリッシュ','はなやか'];
 const CC_HNAME=['ふつう','ボウズ','わけめ','ツンツン','アフロ','おかっぱ','ながめ','ツインテ','モヒカン','ポニテ','おだんご','みつあみ','ウルフ','マッシュ','リーゼント','てんパ','ショート','ロング','サイドテ','おさげ','はげ','オールバック','もじゃ','ハーフアップ','ドレッド','さむらい','プリンセス','かりあげ','ベリショ','ロングツイン'];
+/* Face shape, eyes, brows, eye color */
+const CC_FNAME=['ふつう','まるがお','ほそがお','しかくがお','ハートがた'];
+const CC_FACE=[{rx:0,ry:0,jaw:0},{rx:2,ry:1,jaw:0},{rx:-2,ry:2,jaw:0},{rx:1,ry:-1,jaw:2},{rx:0,ry:0,jaw:-1}];
+const CC_ENAME=['ふつう','パッチリ','つり目','たれ目','ほそめ','まんまる','キラキラ','ジト目'];
+const CC_ECLR=[['#2a3050','くろ'],['#604020','ちゃいろ'],['#2050a0','あお'],['#207040','みどり'],['#a02030','あか'],['#503080','むらさき'],['#a08020','きんいろ'],['#505058','グレー']];
+const CC_BWNAME=['ふつう','ふとい','ほそい','つりあがり','さがり','まろ'];
 /* Body: h=head size(0small,1med,2tall), bw=body width, bh=body height, lh=leg height, sk=skirt, hu=hunch — 64x64 */
 const CC_PROPS=[
 {h:0,bw:20,bh:14,lh:8},{h:0,bw:18,bh:14,lh:8,sk:1},{h:1,bw:22,bh:18,lh:10},{h:1,bw:20,bh:18,lh:10,sk:1},
@@ -533,11 +543,18 @@ const hc=cc?CC_HCLR[cc.hair]||CC_HCLR[0]:CC_HCLR[0];
 const armc=ARM_CLR[arm||'']||ARM_CLR[''];
 const st=(!arm&&cc)?CC_LOOK[cc.look]||CC_LOOK[0]:armc;
 const hs=cc?(cc.hshape||0):0;
+const eyeStyle=cc?(cc.eye||0):0;
+const browStyle=cc?(cc.brow||0):0;
+const faceIdx=cc?(cc.face||0):0;
+const eyeClrIdx=cc?(cc.eclr||0):0;
 const SM=sk[0],SD=sk[1],SL=sk[2]||SM;
 const HM=hc[0],HD=hc[1];
 const HL=hc[2]||_lgt(HM,30);
 const CM=st[0],CD=st[1],CA=st[3]||st[0],CS=st[2]||'#604020';
-const cx=26,headRX=pr.h===0?14:12,headRY=pr.h===0?12:10;
+const IRIS=CC_ECLR[eyeClrIdx]?CC_ECLR[eyeClrIdx][0]:'#2a3050';
+const IRIS2=_lgt(IRIS,-30);
+const fc=CC_FACE[faceIdx]||CC_FACE[0];
+const cx=26,headRX=(pr.h===0?14:12)+fc.rx,headRY=(pr.h===0?12:10)+fc.ry;
 const headCY=pr.h===0?18:(pr.h===1?16:14);
 const neckY=headCY+headRY+1;
 const bodyY=neckY+(pr.h===0?2:4);
@@ -597,24 +614,48 @@ c.fillStyle='rgba(0,0,0,0.04)';for(let dy=Math.floor(headRY*0.3);dy<=headRY;dy++
 /* ears */
 rect(cx-headRX-2,headCY-1,3,4,SM);rect(cx-headRX-1,headCY,1,2,SD);
 rect(cx+headRX,headCY-1,3,4,SM);rect(cx+headRX+1,headCY,1,2,SD);
-/* jawline shadow */
-for(let dx=-4;dx<=4;dx++)px(cx+dx,headCY+headRY,SD);
-for(let dx=-3;dx<=3;dx++)px(cx+dx,headCY+headRY-1,'rgba(0,0,0,0.05)');
-/* eyes */
+/* jawline — face shape */
+const jawW=4+fc.jaw;
+for(let dx=-jawW;dx<=jawW;dx++)px(cx+dx,headCY+headRY,SD);
+for(let dx=-(jawW-1);dx<=(jawW-1);dx++)px(cx+dx,headCY+headRY-1,'rgba(0,0,0,0.05)');
+if(fc.jaw>0){for(let dy=-2;dy<=2;dy++){px(cx-headRX+1,headCY+headRY-3+dy,SD);px(cx+headRX-1,headCY+headRY-3+dy,SD)}}
+if(fc.jaw<0){oval(cx,headCY+headRY-2,headRX-2,2,SM)}
+/* ===== EYES (8 styles) ===== */
 const eyr=headCY+1;
-/* eye whites */
-c.fillStyle='#f0f0e8';c.fillRect(cx-9,eyr,5,4);c.fillRect(cx+5,eyr,5,4);
+const _drawEyes=(es)=>{
+const ew=(es===1||es===5||es===6)?6:(es===4||es===7)?4:5;
+const eh=(es===1||es===5)?5:(es===4||es===7)?2:(es===2||es===3)?3:4;
+const lx=cx-Math.floor(ew*1.6),rx=cx+Math.floor(ew*0.6);
+const lOff=(es===2)?-1:(es===3)?1:0;const rOff=(es===2)?1:(es===3)?-1:0;
+/* whites */
+c.fillStyle='#f0f0e8';c.fillRect(lx,eyr+lOff,ew,eh);c.fillRect(rx,eyr+rOff,ew,eh);
 /* iris */
-c.fillStyle='#2a3050';c.fillRect(cx-7,eyr+1,3,3);c.fillRect(cx+7,eyr+1,3,3);
+const iw=(es===1||es===5||es===6)?4:(es===4||es===7)?3:3;
+const ih=(es===1||es===5)?4:(es===4||es===7)?2:3;
+const ix=Math.floor((ew-iw)/2);const iy=Math.max(0,Math.floor((eh-ih)/2));
+c.fillStyle=IRIS;c.fillRect(lx+ix,eyr+lOff+iy,iw,ih);c.fillRect(rx+ix,eyr+rOff+iy,iw,ih);
 /* pupil */
-c.fillStyle='#101020';c.fillRect(cx-6,eyr+2,2,2);c.fillRect(cx+8,eyr+2,2,2);
-/* eye highlight */
-c.fillStyle='#ffffff';px(cx-8,eyr,'#fff');px(cx+6,eyr,'#fff');px(cx-7,eyr+1,'rgba(255,255,255,0.6)');px(cx+7,eyr+1,'rgba(255,255,255,0.6)');
+const pw=Math.max(1,iw-1),ph=Math.max(1,ih-1);
+c.fillStyle=IRIS2;c.fillRect(lx+ix+1,eyr+lOff+iy+1,pw,ph);c.fillRect(rx+ix+1,eyr+rOff+iy+1,pw,ph);
+/* highlight */
+c.fillStyle='#fff';px(lx+1,eyr+lOff,'#fff');px(rx+1,eyr+rOff,'#fff');
+if(es===6){px(lx+ew-2,eyr+lOff+1,'#fff');px(rx+ew-2,eyr+rOff+1,'#fff');px(lx+2,eyr+lOff+eh-1,'rgba(255,255,255,0.4)');px(rx+2,eyr+rOff+eh-1,'rgba(255,255,255,0.4)')}
 /* eyelashes */
-c.fillStyle='#1a1a30';c.fillRect(cx-9,eyr,5,1);c.fillRect(cx+5,eyr,5,1);
-/* brows */
-c.fillStyle=HD;c.fillRect(cx-9,eyr-2,5,1);c.fillRect(cx+5,eyr-2,5,1);
-c.fillRect(cx-10,eyr-3,3,1);c.fillRect(cx+8,eyr-3,3,1);
+c.fillStyle='#1a1a30';c.fillRect(lx,eyr+lOff,ew,1);c.fillRect(rx,eyr+rOff,ew,1);
+if(es===2){px(lx+ew,eyr+lOff-1,'#1a1a30');px(rx,eyr+rOff-1,'#1a1a30')}
+if(es===3){px(lx,eyr+lOff-1,'#1a1a30');px(rx+ew-1,eyr+rOff-1,'#1a1a30')}
+if(es===5){c.fillRect(lx,eyr+lOff+eh-1,ew,1);c.fillRect(rx,eyr+rOff+eh-1,ew,1)}
+};_drawEyes(eyeStyle);
+/* ===== BROWS (6 styles) ===== */
+const _drawBrows=(bs)=>{
+c.fillStyle=HD;const by=eyr-2;
+if(bs===0){c.fillRect(cx-9,by,5,1);c.fillRect(cx+5,by,5,1);c.fillRect(cx-10,by-1,3,1);c.fillRect(cx+8,by-1,3,1)}
+else if(bs===1){c.fillRect(cx-10,by-1,6,2);c.fillRect(cx+5,by-1,6,2);c.fillRect(cx-10,by,6,1);c.fillRect(cx+5,by,6,1)}
+else if(bs===2){c.fillRect(cx-8,by,4,1);c.fillRect(cx+5,by,4,1)}
+else if(bs===3){c.fillRect(cx-10,by,5,1);c.fillRect(cx+6,by,5,1);c.fillRect(cx-9,by-1,3,1);c.fillRect(cx+8,by-1,3,1);px(cx-10,by+1,HD);px(cx+10,by+1,HD)}
+else if(bs===4){c.fillRect(cx-9,by,5,1);c.fillRect(cx+5,by,5,1);c.fillRect(cx-10,by+1,2,1);c.fillRect(cx+9,by+1,2,1)}
+else if(bs===5){oval(cx-7,by,2,1,HD);oval(cx+7,by,2,1,HD)}
+};_drawBrows(browStyle);
 /* nose */
 px(cx,eyr+5,SD);px(cx-1,eyr+5,SD);px(cx,eyr+6,'rgba(0,0,0,0.1)');
 /* mouth */
@@ -752,7 +793,7 @@ function showNext(c){document.querySelectorAll('.kb-key').forEach(k=>k.classList
 
 /* ===== GAME ===== */
 const mI=document.getElementById('mobile-input');
-const PDEF={name:'',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',armor:'',def:0,items:{},ccBody:2,ccSkin:0,ccHairClr:0,ccLook:0,ccHShape:0};
+const PDEF={name:'',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',armor:'',def:0,items:{},ccBody:2,ccSkin:0,ccHairClr:0,ccLook:0,ccHShape:0,ccEye:0,ccBrow:0,ccFace:0,ccEclr:0};
 const Game={
   slots:[null,null,null],activeSlot:0,
   p:{...PDEF},
@@ -821,7 +862,7 @@ const Game={
   updatePotionBtn(){const btn=document.getElementById('potion-btn');if(!btn)return;const tot=Object.values(this.p.items).reduce((a,b)=>a+b,0);btn.textContent='💊'+tot;btn.className=tot>0?'potion-btn':'potion-btn empty'},
   usePotion(){const items=this.p.items;const keys=['i1','i2','i3'];let used=null;for(const k of keys){if(items[k]&&items[k]>0){used=k;break}}if(!used)return;const it=[...SHOP_ITEMS].find(i=>i.id===used);if(!it)return;items[used]--;if(items[used]<=0)delete items[used];const heal=it.heal>=9999?this.pMaxHp:it.heal;this.pHp=Math.min(this.pMaxHp,this.pHp+heal);sfxPotion();spawnP(window.innerWidth/2,window.innerHeight*.6,'#30d030',8);this.updatePHP();this.updatePotionBtn();this.save()},
 
-  getCC(){return{body:this.p.ccBody??2,skin:this.p.ccSkin||0,hair:this.p.ccHairClr||0,look:this.p.ccLook||0,hshape:this.p.ccHShape||0}},
+  getCC(){return{body:this.p.ccBody??2,skin:this.p.ccSkin||0,hair:this.p.ccHairClr||0,look:this.p.ccLook||0,hshape:this.p.ccHShape||0,eye:this.p.ccEye||0,brow:this.p.ccBrow||0,face:this.p.ccFace||0,eclr:this.p.ccEclr||0}},
   refreshAvatar(){const cc=this.getCC();const b=document.getElementById('avatar-battle');if(b)drawAvatar(b,this.p.weapon,this.p.armor,cc);const s=document.getElementById('avatar-shop');if(s)drawAvatar(s,this.p.weapon,this.p.armor,cc)},
 
   /* ===== SHOP ===== */
@@ -899,11 +940,11 @@ const Game={
         localStorage.setItem('tq_backup',JSON.stringify({slot:this.activeSlot,data:this.slots[this.activeSlot],time:Date.now()}));
       }
     }
-    initA();const cc={ccBody:this.p.ccBody??2,ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccLook:this.p.ccLook||0,ccHShape:this.p.ccHShape||0};this.p={...PDEF,name:document.getElementById('player-name').value.trim()||'ゆうしゃ',...cc,playTime:0,lastSaved:Date.now()};this.stage=1;this.save();this.startAdventure()},
+    initA();const cc={ccBody:this.p.ccBody??2,ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccLook:this.p.ccLook||0,ccHShape:this.p.ccHShape||0,ccEye:this.p.ccEye||0,ccBrow:this.p.ccBrow||0,ccFace:this.p.ccFace||0,ccEclr:this.p.ccEclr||0};this.p={...PDEF,name:document.getElementById('player-name').value.trim()||'ゆうしゃ',...cc,playTime:0,lastSaved:Date.now()};this.stage=1;this.save();this.startAdventure()},
   updateTitleBtns(){const el=document.getElementById('title-buttons');if(!el)return;const hasSave=this.p.level>1||this.p.wt>0;if(hasSave){el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="128" height="128" style="width:128px;height:128px;margin:4px auto"></canvas><button class="btn btn-green" onclick="Game.startAdventure()">つづきから (Lv'+this.p.level+' 💰'+this.p.gold+'G)</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.newGame()">はじめから</button> <button class="btn btn-small" style="margin-top:5px" onclick="Game.openCC()">🎨 キャラメイク</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor,this.getCC())}else{el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="128" height="128" style="width:192px;height:192px;margin:6px auto;display:block"></canvas><button class="btn btn-green" style="margin-top:5px" onclick="Game.openCC()">🎨 みためを きめよう!</button><br><button class="btn btn-green" style="margin-top:5px" onclick="Game.startAdventure()">ぼうけんに でる</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor,this.getCC())}},
 
-  openCC(){this._ccBak={ccBody:this.p.ccBody??2,ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccLook:this.p.ccLook||0,ccHShape:this.p.ccHShape||0};this.renderCCOpts();this.refreshCCPreview();this.showScreen('cc-screen')},
-  renderCCOpts(){const mk=(id,arr,cur,fn,mode)=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='';arr.forEach((v,i)=>{if(mode==='swatch'){const d=document.createElement('div');d.className='cc-swatch'+(i===cur?' sel':'');d.style.background=typeof v==='string'?v:v[0];d.onclick=()=>fn(i);el.appendChild(d)}else{const b=document.createElement('button');b.className='cc-hair-btn'+(i===cur?' sel':'');b.textContent=v;b.onclick=()=>fn(i);el.appendChild(b)}})};mk('cc-body-opts',CC_BNAME,this.p.ccBody??2,i=>{this.p.ccBody=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-skin-opts',CC_SKIN.map(s=>s[0]),this.p.ccSkin||0,i=>{this.p.ccSkin=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-look-opts',CC_LNAME,this.p.ccLook||0,i=>{this.p.ccLook=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-hair-opts',CC_HNAME,this.p.ccHShape||0,i=>{this.p.ccHShape=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-hclr-opts',CC_HCLR.map(h=>h[0]),this.p.ccHairClr||0,i=>{this.p.ccHairClr=i;this.renderCCOpts();this.refreshCCPreview()},'swatch')},
+  openCC(){this._ccBak={ccBody:this.p.ccBody??2,ccSkin:this.p.ccSkin||0,ccHairClr:this.p.ccHairClr||0,ccLook:this.p.ccLook||0,ccHShape:this.p.ccHShape||0,ccEye:this.p.ccEye||0,ccBrow:this.p.ccBrow||0,ccFace:this.p.ccFace||0,ccEclr:this.p.ccEclr||0};this.renderCCOpts();this.refreshCCPreview();this.showScreen('cc-screen')},
+  renderCCOpts(){const mk=(id,arr,cur,fn,mode)=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='';arr.forEach((v,i)=>{if(mode==='swatch'){const d=document.createElement('div');d.className='cc-swatch'+(i===cur?' sel':'');d.style.background=typeof v==='string'?v:v[0];d.onclick=()=>fn(i);el.appendChild(d)}else{const b=document.createElement('button');b.className='cc-hair-btn'+(i===cur?' sel':'');b.textContent=v;b.onclick=()=>fn(i);el.appendChild(b)}})};mk('cc-body-opts',CC_BNAME,this.p.ccBody??2,i=>{this.p.ccBody=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-skin-opts',CC_SKIN.map(s=>s[0]),this.p.ccSkin||0,i=>{this.p.ccSkin=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-look-opts',CC_LNAME,this.p.ccLook||0,i=>{this.p.ccLook=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-hair-opts',CC_HNAME,this.p.ccHShape||0,i=>{this.p.ccHShape=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-hclr-opts',CC_HCLR.map(h=>h[0]),this.p.ccHairClr||0,i=>{this.p.ccHairClr=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-face-opts',CC_FNAME,this.p.ccFace||0,i=>{this.p.ccFace=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-eye-opts',CC_ENAME,this.p.ccEye||0,i=>{this.p.ccEye=i;this.renderCCOpts();this.refreshCCPreview()},'btn');mk('cc-eclr-opts',CC_ECLR.map(e=>e[0]),this.p.ccEclr||0,i=>{this.p.ccEclr=i;this.renderCCOpts();this.refreshCCPreview()},'swatch');mk('cc-brow-opts',CC_BWNAME,this.p.ccBrow||0,i=>{this.p.ccBrow=i;this.renderCCOpts();this.refreshCCPreview()},'btn')},
   refreshCCPreview(){const cv=document.getElementById('cc-preview');if(cv)drawAvatar(cv,this.p.weapon,this.p.armor,this.getCC())},
   confirmCC(){this.save();this.renderSlots();this.selectSlot(this.activeSlot);this.showScreen('title-screen')},
   cancelCC(){Object.assign(this.p,this._ccBak);this.showScreen('title-screen')},
@@ -914,7 +955,7 @@ const Game={
   fmtPlayTime(s){if(!s||s<0)return'0:00';s=Math.floor(s);const h=Math.floor(s/3600);const m=Math.floor((s%3600)/60);return h>0?h+':'+String(m).padStart(2,'0')+'h':m+'ぷん'},
   fmtSaveDate(t){if(!t)return'';const d=new Date(t);return(d.getMonth()+1)+'/'+d.getDate()+' '+d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')},
   getStageName(st){return['はじまりの もり','やまの どうくつ','うみの しんでん','ほのおの とう','まおうの しろ','てんくうの しま','こおりの きょうこく','やみの じゅかい','ほしの しんでん','しんかいの おうきゅう'][Math.min((st||1)-1,9)]},
-  renderSlots(){const g=document.getElementById('slot-grid');if(!g)return;g.innerHTML='';this.slots.forEach((sl,i)=>{const d=document.createElement('div');d.className='slot-card'+(i===this.activeSlot?' sel':'');d.onclick=()=>this.selectSlot(i);if(sl&&sl.p&&(sl.p.level>1||sl.p.wt>0||sl.p.gold>0)){const num=document.createElement('div');num.className='slot-num';num.textContent='SLOT '+(i+1);d.appendChild(num);const cv=document.createElement('canvas');cv.width=128;cv.height=128;cv.style.cssText='width:64px;height:64px;image-rendering:pixelated;image-rendering:crisp-edges;display:block;margin:0 auto';const cc={body:sl.p.ccBody??2,skin:sl.p.ccSkin||0,hair:sl.p.ccHairClr||0,look:sl.p.ccLook||0,hshape:sl.p.ccHShape||0};drawAvatar(cv,sl.p.weapon,sl.p.armor,cc);d.appendChild(cv);const nm=document.createElement('div');nm.className='slot-name';nm.textContent=sl.p.name||'???';d.appendChild(nm);const dt=document.createElement('div');dt.className='slot-detail';dt.textContent='Lv.'+sl.p.level+' 💰'+(sl.p.gold||0)+'G';d.appendChild(dt);const st=document.createElement('div');st.className='slot-detail';st.textContent='📍'+this.getStageName(sl.stage)+' ⏱'+this.fmtPlayTime(sl.p.playTime);d.appendChild(st);if(sl.p.lastSaved){const sv=document.createElement('div');sv.className='slot-detail';sv.style.color='#484858';sv.textContent=this.fmtSaveDate(sl.p.lastSaved);d.appendChild(sv)}const del=document.createElement('button');del.className='slot-del';del.textContent='✕';del.onclick=e=>{e.stopPropagation();this.deleteSlot(i)};d.appendChild(del)}else{d.innerHTML='<div class="slot-num">SLOT '+(i+1)+'</div><div class="slot-empty">からっぽ</div>'}g.appendChild(d)});document.getElementById('slot-select').style.display='';document.getElementById('slot-actions').style.display='none'},
+  renderSlots(){const g=document.getElementById('slot-grid');if(!g)return;g.innerHTML='';this.slots.forEach((sl,i)=>{const d=document.createElement('div');d.className='slot-card'+(i===this.activeSlot?' sel':'');d.onclick=()=>this.selectSlot(i);if(sl&&sl.p&&(sl.p.level>1||sl.p.wt>0||sl.p.gold>0)){const num=document.createElement('div');num.className='slot-num';num.textContent='SLOT '+(i+1);d.appendChild(num);const cv=document.createElement('canvas');cv.width=128;cv.height=128;cv.style.cssText='width:64px;height:64px;image-rendering:pixelated;image-rendering:crisp-edges;display:block;margin:0 auto';const cc={body:sl.p.ccBody??2,skin:sl.p.ccSkin||0,hair:sl.p.ccHairClr||0,look:sl.p.ccLook||0,hshape:sl.p.ccHShape||0,eye:sl.p.ccEye||0,brow:sl.p.ccBrow||0,face:sl.p.ccFace||0,eclr:sl.p.ccEclr||0};drawAvatar(cv,sl.p.weapon,sl.p.armor,cc);d.appendChild(cv);const nm=document.createElement('div');nm.className='slot-name';nm.textContent=sl.p.name||'???';d.appendChild(nm);const dt=document.createElement('div');dt.className='slot-detail';dt.textContent='Lv.'+sl.p.level+' 💰'+(sl.p.gold||0)+'G';d.appendChild(dt);const st=document.createElement('div');st.className='slot-detail';st.textContent='📍'+this.getStageName(sl.stage)+' ⏱'+this.fmtPlayTime(sl.p.playTime);d.appendChild(st);if(sl.p.lastSaved){const sv=document.createElement('div');sv.className='slot-detail';sv.style.color='#484858';sv.textContent=this.fmtSaveDate(sl.p.lastSaved);d.appendChild(sv)}const del=document.createElement('button');del.className='slot-del';del.textContent='✕';del.onclick=e=>{e.stopPropagation();this.deleteSlot(i)};d.appendChild(del)}else{d.innerHTML='<div class="slot-num">SLOT '+(i+1)+'</div><div class="slot-empty">からっぽ</div>'}g.appendChild(d)});document.getElementById('slot-select').style.display='';document.getElementById('slot-actions').style.display='none'},
   selectSlot(i){this.activeSlot=i;this.loadSlot(i);document.querySelectorAll('.slot-card').forEach((c,j)=>{c.classList.toggle('sel',j===i)});document.getElementById('slot-select').style.display='none';document.getElementById('slot-actions').style.display='';document.getElementById('player-name').value=this.p.name;this.updateTitleBtns()},
   deleteSlot(i){const sl=this.slots[i];if(!sl)return;if(!confirm('スロット'+(i+1)+'の データを けす？'))return;this.slots[i]=null;localStorage.setItem('tq_slots',JSON.stringify(this.slots));if(i===this.activeSlot){this.p={...PDEF};this.stage=1}this.renderSlots()},
   backToSlots(){this.renderSlots()},
