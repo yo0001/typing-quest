@@ -162,6 +162,11 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 .potion-btn{font-family:'Press Start 2P','DotGothic16',monospace;font-size:7px;padding:4px 8px;cursor:pointer;border:2px solid var(--green);background:#103010;color:var(--green);margin-left:4px}
 .potion-btn:active{background:#205020}
 .potion-btn.empty{opacity:.3;cursor:default;border-color:#303048;color:#303048}
+.avatar-preview{image-rendering:pixelated;image-rendering:crisp-edges;width:80px;height:80px;margin:6px auto;border:3px solid #484858;background:#000010}
+.avatar-mini{image-rendering:pixelated;image-rendering:crisp-edges;width:28px;height:28px}
+.avatar-battle{display:flex;align-items:center;justify-content:center;gap:16px;margin:2px 0}
+.vs-label{font-size:10px;color:var(--red);text-shadow:1px 1px 0 #000}
+#battle-screen.kb-open .avatar-battle{display:none}
 #battle-screen.kb-open .atk-wrap{margin:0 auto 1px}
 #battle-screen.kb-open .atk-label{display:none}
 #mobile-input.pc-ime{position:static!important;left:auto!important;width:90%!important;max-width:400px;height:auto!important;opacity:1!important;font-family:'DotGothic16','Press Start 2P',monospace;font-size:16px;padding:8px 12px;background:#000010;border:3px solid var(--gold);color:var(--gold);caret-color:var(--gold);text-align:center;outline:none;margin:6px auto;display:block!important;box-shadow:inset 2px 2px 0 #000}
@@ -206,7 +211,11 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
     <div class="stat-item"><span class="gold-stat" id="s-gold">💰0</span></div>
   </div>
   <div class="mon-stage" id="m-stage">STAGE 1</div>
-  <canvas class="mon-canvas" id="m-canvas" width="16" height="16"></canvas>
+  <div class="avatar-battle">
+    <canvas class="avatar-mini" id="avatar-battle" width="16" height="16"></canvas>
+    <span class="vs-label">VS</span>
+    <canvas class="mon-canvas" id="m-canvas" width="16" height="16" style="margin:0"></canvas>
+  </div>
   <div class="mon-name" id="m-name"></div>
   <div class="hp-wrap">
     <div class="hp-txt" id="m-hp-txt">HP 30/30</div>
@@ -252,10 +261,12 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
 <div id="shop-screen" class="screen">
   <div class="panel" style="max-width:440px">
     <h2>🏪 ショップ</h2>
+    <canvas class="avatar-preview" id="avatar-shop" width="16" height="16"></canvas>
     <div class="shop-gold" id="shop-gold">💰 0G</div>
     <div class="shop-tabs">
       <div class="shop-tab active" onclick="Game.shopTab('inn')" id="tab-inn">🏨やどや</div>
-      <div class="shop-tab" onclick="Game.shopTab('weapon')" id="tab-weapon">⚔️ぶきや</div>
+      <div class="shop-tab" onclick="Game.shopTab('weapon')" id="tab-weapon">⚔️ぶき</div>
+      <div class="shop-tab" onclick="Game.shopTab('armor')" id="tab-armor">🛡️よろい</div>
       <div class="shop-tab" onclick="Game.shopTab('item')" id="tab-item">🧪どうぐ</div>
     </div>
     <div class="shop-list" id="shop-list"></div>
@@ -409,6 +420,20 @@ function sfxBuy(){[523,659,784,1047].forEach((f,i)=>setTimeout(()=>snd(f,.08,'tr
 function sfxPotion(){snd(784,.1,'triangle');setTimeout(()=>snd(1047,.08,'triangle'),80)}
 function sfxInn(){[392,523,659,784,659,784,1047].forEach((f,i)=>setTimeout(()=>snd(f,.12,'triangle'),i*100))}
 
+/* ===== PLAYER AVATAR ===== */
+const AVT_BASE={c:['','#805030','#604020','#e0b080','#c09060','#203880','#d8d8d0','#3060c0','#604020','#f0f0e0'],
+d:['0000012200000000','0001111100000000','0011111110000000','0013333310000000','0033535330000000','0033333330000000','0013343310000000','0001111100000000','0000696000000000','0006666600000000','0036666300000000','0006966600000000','0000777000000000','0000707000000000','0000808000000000','0000000000000000']};
+const ARM_CLR={'':['#d8d8d0','#3060c0','#604020','#f0f0e0'],a1:['#a07040','#806030','#604020','#c09060'],a2:['#808890','#607078','#505860','#a0a8b0'],a3:['#6040c0','#4838a0','#383080','#8060e0'],a4:['#d0a820','#b09018','#806010','#f0d040']};
+const WPN_PX={w1:{c:'#805030',px:[[10,4],[10,5],[11,6],[11,7],[12,8],[12,9]]},w2:{c:'#a0a0a8',px:[[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w3:{c:'#c0c8d0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030']]},w4:{c:'#5080e0',px:[[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,3,'#80c0f0'],[11,3,'#80c0f0']]},w5:{c:'#d0a820',px:[[10,1],[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[11,8],[10,9,'#805030'],[9,2,'#f0d840'],[11,2,'#f0d840'],[9,4,'#f0d840'],[11,4,'#f0d840']]}};
+function drawAvatar(cv,wpn,arm){const c=cv.getContext('2d');cv.width=16;cv.height=16;c.clearRect(0,0,16,16);const ac=ARM_CLR[arm||'']||ARM_CLR[''];const palette=[null,'#805030','#604020','#e0b080','#c09060','#203880',ac[0],ac[1],ac[2],ac[3]];for(let y=0;y<16;y++)for(let x=0;x<AVT_BASE.d[y].length;x++){const i=parseInt(AVT_BASE.d[y][x]);if(i>0&&palette[i]){c.fillStyle=palette[i];c.fillRect(x,y,1,1)}}const wp=WPN_PX[wpn];if(wp)wp.px.forEach(p=>{c.fillStyle=p[2]||wp.c;c.fillRect(p[0],p[1],1,1)})}
+
+const SHOP_ARMOR=[
+  {id:'a1',name:'かわのふく',desc:'ぼうぎょ+2',def:2,cost:40},
+  {id:'a2',name:'てつのよろい',desc:'ぼうぎょ+5',def:5,cost:150},
+  {id:'a3',name:'まほうのローブ',desc:'ぼうぎょ+8',def:8,cost:350},
+  {id:'a4',name:'でんせつのよろい',desc:'ぼうぎょ+15',def:15,cost:900},
+];
+
 /* ===== SHOP DATA ===== */
 const SHOP_WEAPONS=[
   {id:'w1',name:'きのぼう',desc:'こうげき+2',atk:2,cost:50},
@@ -443,7 +468,7 @@ function showNext(c){document.querySelectorAll('.kb-key').forEach(k=>k.classList
 /* ===== GAME ===== */
 const mI=document.getElementById('mobile-input');
 const Game={
-  p:{name:'',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',items:{}},
+  p:{name:'',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',armor:'',def:0,items:{}},
   stage:1,mon:null,mHp:0,mMax:0,mD:0,pHp:100,pMaxHp:100,atkT:0,atkMax:20,atkDmg:5,atkInt:null,
   word:'',chars:[],cur:0,hasErr:false,
   streak:0,wS:0,sS:0,sW:0,sC:0,sE:0,wIS:0,wPS:10,mBuf:'',composing:false,mOffset:0,wBag:[],wBagS:0,
@@ -465,7 +490,7 @@ const Game={
 
   showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='ranking-screen')this.renderR();if(id==='free-screen')setTimeout(()=>document.getElementById('free-input').focus(),50)},
 
-  startAdventure(){try{initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';if(!this.p.items)this.p.items={};this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=7?3:this.p.level<=10?4:5;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;this.stageGold=0;this.pMaxHp=80+this.p.level*10;this.pHp=this.pMaxHp;mI.value='';this.mOffset=0;this.spawnM();this.showScreen('battle-screen');this.updateS();this.updatePHP();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)}catch(e){alert('Error: '+e.message);console.error(e)}},
+  startAdventure(){try{initA();this.p.name=document.getElementById('player-name').value.trim()||'ゆうしゃ';if(!this.p.items)this.p.items={};this.stage=this.p.level<=2?1:this.p.level<=4?2:this.p.level<=7?3:this.p.level<=10?4:5;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;this.stageGold=0;this.pMaxHp=80+this.p.level*10;this.pHp=this.pMaxHp;mI.value='';this.mOffset=0;this.spawnM();this.showScreen('battle-screen');this.updateS();this.updatePHP();this.refreshAvatar();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)}catch(e){alert('Error: '+e.message);console.error(e)}},
 
   backToTitle(){this.stopAtkTimer();this.save();this.updateTitleBtns();this.showScreen('title-screen')},
 
@@ -508,13 +533,16 @@ const Game={
   updatePotionBtn(){const btn=document.getElementById('potion-btn');if(!btn)return;const tot=Object.values(this.p.items).reduce((a,b)=>a+b,0);btn.textContent='💊'+tot;btn.className=tot>0?'potion-btn':'potion-btn empty'},
   usePotion(){const items=this.p.items;const keys=['i1','i2','i3'];let used=null;for(const k of keys){if(items[k]&&items[k]>0){used=k;break}}if(!used)return;const it=[...SHOP_ITEMS].find(i=>i.id===used);if(!it)return;items[used]--;if(items[used]<=0)delete items[used];const heal=it.heal>=9999?this.pMaxHp:it.heal;this.pHp=Math.min(this.pMaxHp,this.pHp+heal);sfxPotion();spawnP(window.innerWidth/2,window.innerHeight*.6,'#30d030',8);this.updatePHP();this.updatePotionBtn();this.save()},
 
+  refreshAvatar(){const b=document.getElementById('avatar-battle');if(b)drawAvatar(b,this.p.weapon,this.p.armor);const s=document.getElementById('avatar-shop');if(s)drawAvatar(s,this.p.weapon,this.p.armor)},
+
   /* ===== SHOP ===== */
-  openShop(){this.stageGold=0;document.getElementById('shop-gold').textContent='💰 '+this.p.gold+'G';this.shopBuying=null;document.getElementById('shop-typing-area').classList.remove('active');document.getElementById('discount-msg').textContent='';this.shopTab('inn');this.showScreen('shop-screen')},
-  shopTab(tab){document.querySelectorAll('.shop-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');this.shopBuying=null;document.getElementById('shop-typing-area').classList.remove('active');document.getElementById('discount-msg').textContent='';const list=document.getElementById('shop-list');if(tab==='inn'){const canAfford=this.p.gold>=INN_COST;const full=this.pHp>=this.pMaxHp;list.innerHTML=`<div class="shop-item${!canAfford?' cant-afford':''}${full?' owned':''}" onclick="Game.shopBuyStart('inn')"><span class="si-name">🏨 やどや</span><span class="si-desc">HPぜんかいふく</span><span class="si-cost${!canAfford?' expensive':''}">${INN_COST}G</span></div><div style="font-size:7px;color:#606070;margin:6px 0;text-align:center">HP: ${this.pHp} / ${this.pMaxHp}</div>`}else if(tab==='weapon'){list.innerHTML=SHOP_WEAPONS.map(w=>{const owned=this.p.weapon===w.id;const canA=this.p.gold>=w.cost;return`<div class="shop-item${owned?' owned':''}${!canA&&!owned?' cant-afford':''}" onclick="Game.shopBuyStart('weapon','${w.id}')"><span class="si-name">⚔️ ${w.name}${owned?'<span class=shop-equip>そうび中</span>':''}</span><span class="si-desc">${w.desc}</span><span class="si-cost${!canA&&!owned?' expensive':''}">${owned?'---':w.cost+'G'}</span></div>`}).join('')}else{list.innerHTML=SHOP_ITEMS.map(it=>{const qty=this.p.items[it.id]||0;const canA=this.p.gold>=it.cost;return`<div class="shop-item${!canA?' cant-afford':''}" onclick="Game.shopBuyStart('item','${it.id}')"><span class="si-name">🧪 ${it.name}${qty>0?'<span class=item-count>×'+qty+'</span>':''}</span><span class="si-desc">${it.desc}</span><span class="si-cost${!canA?' expensive':''}">${it.cost}G</span></div>`}).join('')}},
+  openShop(){this.stageGold=0;document.getElementById('shop-gold').textContent='💰 '+this.p.gold+'G';this.shopBuying=null;document.getElementById('shop-typing-area').classList.remove('active');document.getElementById('discount-msg').textContent='';this.refreshAvatar();this.shopTab('inn');this.showScreen('shop-screen')},
+  shopTab(tab){document.querySelectorAll('.shop-tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+tab).classList.add('active');this.shopBuying=null;document.getElementById('shop-typing-area').classList.remove('active');document.getElementById('discount-msg').textContent='';const list=document.getElementById('shop-list');if(tab==='inn'){const canAfford=this.p.gold>=INN_COST;const full=this.pHp>=this.pMaxHp;list.innerHTML=`<div class="shop-item${!canAfford?' cant-afford':''}${full?' owned':''}" onclick="Game.shopBuyStart('inn')"><span class="si-name">🏨 やどや</span><span class="si-desc">HPぜんかいふく</span><span class="si-cost${!canAfford?' expensive':''}">${INN_COST}G</span></div><div style="font-size:7px;color:#606070;margin:6px 0;text-align:center">HP: ${this.pHp} / ${this.pMaxHp}</div>`}else if(tab==='weapon'){list.innerHTML=SHOP_WEAPONS.map(w=>{const owned=this.p.weapon===w.id;const canA=this.p.gold>=w.cost;return`<div class="shop-item${owned?' owned':''}${!canA&&!owned?' cant-afford':''}" onclick="Game.shopBuyStart('weapon','${w.id}')"><span class="si-name">⚔️ ${w.name}${owned?'<span class=shop-equip>そうび中</span>':''}</span><span class="si-desc">${w.desc}</span><span class="si-cost${!canA&&!owned?' expensive':''}">${owned?'---':w.cost+'G'}</span></div>`}).join('')}else if(tab==='armor'){list.innerHTML=SHOP_ARMOR.map(a=>{const owned=this.p.armor===a.id;const canA=this.p.gold>=a.cost;return`<div class="shop-item${owned?' owned':''}${!canA&&!owned?' cant-afford':''}" onclick="Game.shopBuyStart('armor','${a.id}')"><span class="si-name">🛡️ ${a.name}${owned?'<span class=shop-equip>そうび中</span>':''}</span><span class="si-desc">${a.desc}</span><span class="si-cost${!canA&&!owned?' expensive':''}">${owned?'---':a.cost+'G'}</span></div>`}).join('')}else{list.innerHTML=SHOP_ITEMS.map(it=>{const qty=this.p.items[it.id]||0;const canA=this.p.gold>=it.cost;return`<div class="shop-item${!canA?' cant-afford':''}" onclick="Game.shopBuyStart('item','${it.id}')"><span class="si-name">🧪 ${it.name}${qty>0?'<span class=item-count>×'+qty+'</span>':''}</span><span class="si-desc">${it.desc}</span><span class="si-cost${!canA?' expensive':''}">${it.cost}G</span></div>`}).join('')}},
   shopBuyStart(type,id){
     let item,cost,typingWord;
     if(type==='inn'){if(this.pHp>=this.pMaxHp||this.p.gold<INN_COST)return;item={type:'inn'};cost=INN_COST;typingWord='やどや'}
     else if(type==='weapon'){const w=SHOP_WEAPONS.find(x=>x.id===id);if(!w||this.p.weapon===id||this.p.gold<w.cost)return;item={type:'weapon',...w};cost=w.cost;typingWord=w.name}
+    else if(type==='armor'){const a=SHOP_ARMOR.find(x=>x.id===id);if(!a||this.p.armor===id||this.p.gold<a.cost)return;item={type:'armor',...a};cost=a.cost;typingWord=a.name}
     else{const it=SHOP_ITEMS.find(x=>x.id===id);if(!it||this.p.gold<it.cost)return;item={type:'item',...it};cost=it.cost;typingWord=it.name}
     this.shopBuying={item,cost,typingWord};this.shopTypingStart=0;
     const area=document.getElementById('shop-typing-area');area.classList.add('active');
@@ -545,7 +573,9 @@ const Game={
     const item=this.shopBuying.item;
     if(item.type==='inn'){this.pHp=this.pMaxHp;this.updatePHP();sfxInn()}
     else if(item.type==='weapon'){this.p.weapon=item.id;this.p.atk=item.atk;sfxBuy()}
+    else if(item.type==='armor'){this.p.armor=item.id;this.p.def=item.def;sfxBuy()}
     else{this.p.items[item.id]=(this.p.items[item.id]||0)+1;sfxBuy()}
+    this.refreshAvatar();
     spawnBoom(window.innerWidth/2,window.innerHeight*.4);
     document.getElementById('shop-gold').textContent='💰 '+this.p.gold+'G';
     this.save();this.updatePotionBtn();
@@ -560,16 +590,16 @@ const Game={
   stopAtkTimer(){if(this.atkInt){clearInterval(this.atkInt);this.atkInt=null}},
   resetAtk(){this.atkT=0;this.updateAtkBar()},
   updateAtkBar(){const p=Math.min(100,(this.atkT/this.atkMax)*100);const bar=document.getElementById('m-atk');if(!bar)return;bar.style.width=p+'%';bar.className='atk-inner'+(p>80?' danger':p>50?' warn':'')},
-  monAttack(){if(this.pHp<=0)return;sfxHit();this.playerDmg(this.atkDmg);const cv=document.getElementById('m-canvas');cv.style.transform='translateY(8px)';setTimeout(()=>{cv.style.transform=''},150)},
+  monAttack(){if(this.pHp<=0)return;sfxHit();this.playerDmg(Math.max(1,this.atkDmg-this.p.def));const cv=document.getElementById('m-canvas');cv.style.transform='translateY(8px)';setTimeout(()=>{cv.style.transform=''},150)},
   playerDmg(amt){this.pHp=Math.max(0,this.pHp-amt);this.updatePHP();const fl=document.getElementById('dmg-flash');fl.classList.remove('active');fl.offsetHeight;fl.classList.add('active');setTimeout(()=>fl.classList.remove('active'),300);document.body.classList.add('screen-shake');setTimeout(()=>document.body.classList.remove('screen-shake'),400);spawnP(window.innerWidth/2,window.innerHeight*.7,'#d03030',8);if(this.pHp<=0){this.gameOver()}},
   updatePHP(){const el=document.getElementById('s-php');if(!el)return;el.textContent=this.pHp;const pct=this.pHp/this.pMaxHp;el.className='php-txt'+(pct<0.15?' crit':pct<0.35?' low':'')},
   gameOver(){this.stopAtkTimer();sfxBad();setTimeout(()=>sfxBad(),100);setTimeout(()=>snd(80,.3,'sawtooth'),200);const acc=this.sC>0?Math.round(((this.sC-this.sE)/this.sC)*100):100;document.getElementById('gameover-results').innerHTML='<div class="result-item"><div class="label">STAGE</div><div class="value">'+this.stage+'</div></div><div class="result-item"><div class="label">たおした てき</div><div class="value">'+this.mD+'</div></div><div class="result-item"><div class="label">うった ことば</div><div class="value">'+this.sW+'</div></div><div class="result-item"><div class="label">せいかくさ</div><div class="value">'+acc+'%</div></div>';this.save();this.showScreen('gameover-screen')},
   retryBattle(){this.pHp=this.pMaxHp;this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.streak=0;this.mD=0;mI.value='';this.mOffset=0;this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();this.updatePHP();this.updateS();setTimeout(()=>this.focusInput(),200)},
-  newGame(){initA();this.p={name:this.p.name||document.getElementById('player-name').value.trim()||'ゆうしゃ',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',items:{}};this.stage=1;this.save();this.startAdventure()},
-  updateTitleBtns(){const el=document.getElementById('title-buttons');if(!el)return;const nm=this.p.name||'';const hasSave=this.p.level>1||this.p.wt>0;if(hasSave){const wpn=this.p.weapon?SHOP_WEAPONS.find(w=>w.id===this.p.weapon):null;el.innerHTML='<button class="btn btn-green" onclick="Game.startAdventure()">つづきから (Lv'+this.p.level+' 💰'+this.p.gold+'G'+(wpn?' ⚔️'+wpn.name:'')+')</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.newGame()">はじめから</button>'}else{el.innerHTML='<button class="btn btn-green" onclick="Game.startAdventure()">ぼうけんに でる</button>'}},
+  newGame(){initA();this.p={name:this.p.name||document.getElementById('player-name').value.trim()||'ゆうしゃ',level:1,xp:0,xpN:60,wt:0,bW:0,bS:0,tc:0,gold:0,atk:0,weapon:'',armor:'',def:0,items:{}};this.stage=1;this.save();this.startAdventure()},
+  updateTitleBtns(){const el=document.getElementById('title-buttons');if(!el)return;const hasSave=this.p.level>1||this.p.wt>0;if(hasSave){const wpn=this.p.weapon?SHOP_WEAPONS.find(w=>w.id===this.p.weapon):null;const arm=this.p.armor?SHOP_ARMOR.find(a=>a.id===this.p.armor):null;el.innerHTML='<canvas class="avatar-preview" id="avatar-title" width="16" height="16" style="width:64px;height:64px;margin:4px auto"></canvas><button class="btn btn-green" onclick="Game.startAdventure()">つづきから (Lv'+this.p.level+' 💰'+this.p.gold+'G)</button><br><button class="btn btn-small" style="margin-top:5px" onclick="Game.newGame()">はじめから</button>';const tc=document.getElementById('avatar-title');if(tc)drawAvatar(tc,this.p.weapon,this.p.armor)}else{el.innerHTML='<button class="btn btn-green" onclick="Game.startAdventure()">ぼうけんに でる</button>'}},
 
   save(){localStorage.setItem('tq_p',JSON.stringify(this.p));localStorage.setItem('tq_s',this.stage)},
-  load(){const s=localStorage.getItem('tq_p');if(s){const d=JSON.parse(s);this.p=Object.assign({gold:0,atk:0,weapon:'',items:{}},d);if(!this.p.items)this.p.items={}}const t=localStorage.getItem('tq_s');if(t)this.stage=parseInt(t)},
+  load(){const s=localStorage.getItem('tq_p');if(s){const d=JSON.parse(s);this.p=Object.assign({gold:0,atk:0,weapon:'',armor:'',def:0,items:{}},d);if(!this.p.items)this.p.items={}}const t=localStorage.getItem('tq_s');if(t)this.stage=parseInt(t)},
   saveR(w,a){let r=JSON.parse(localStorage.getItem('tq_r')||'[]');r.push({n:this.p.name,l:this.p.level,w,a,s:this.stage,d:new Date().toLocaleDateString('ja-JP')});r.sort((a,b)=>b.w-a.w);r=r.slice(0,20);localStorage.setItem('tq_r',JSON.stringify(r))},
   renderR(){const r=JSON.parse(localStorage.getItem('tq_r')||'[]');const el=document.getElementById('ranking-list');if(!r.length){el.innerHTML='<p style="font-size:8px;color:#606070;text-align:center">まだ データが ないよ</p>';return}el.innerHTML=r.map((e,i)=>`<div class="rank-entry${e.n===this.p.name?' mine':''}"><span class="rank">${i<3?['1st','2nd','3rd'][i]:(i+1)+'.'}</span><span class="rname">${e.n} Lv${e.l}</span><span class="rscore">${e.w}WPM ${e.a}%</span></div>`).join('')},
   updateV(){let c=parseInt(localStorage.getItem('tq_v')||'0');const lv=localStorage.getItem('tq_lv'),td=new Date().toDateString();if(lv!==td){c++;localStorage.setItem('tq_v',c);localStorage.setItem('tq_lv',td)}document.getElementById('visitor-count').textContent='VISITORS: '+c},
