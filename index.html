@@ -279,6 +279,7 @@ h2{font-size:16px;color:var(--txt);text-shadow:2px 2px 0 #000;margin-bottom:8px}
     <div class="gameover-sub">ゆうしゃは たおれた...</div>
     <div class="result-grid" id="gameover-results"></div>
     <button class="btn btn-green" onclick="Game.retryBattle()">もう いちど</button>
+    <button class="btn btn-small" onclick="Game.openShopFromGameover()">🏪 ショップへ</button>
     <button class="btn btn-small" onclick="Game.backToTitle()">タイトルへ</button>
   </div>
 </div>
@@ -552,6 +553,7 @@ const Game={
     this.shopBuying=null;
     setTimeout(()=>{document.getElementById('shop-typing-area').classList.remove('active');this.shopTab(document.querySelector('.shop-tab.active').id.replace('tab-',''))},800);
   },
+  openShopFromGameover(){this.pHp=Math.floor(this.pMaxHp*.3);this.updatePHP();this.openShop()},
   shopToNext(){this.pHp=Math.min(this.pMaxHp,this.pHp);this.updatePHP();this.stage=Math.min(this.stage+1,5);this.sS=Date.now();this.sW=0;this.sC=0;this.sE=0;this.wIS=0;this.mD=0;this.stageGold=0;mI.value='';this.mOffset=0;this.showScreen('battle-screen');this.spawnM();this.startAtkTimer();setTimeout(()=>this.focusInput(),200)},
 
   startAtkTimer(){this.stopAtkTimer();this.atkT=0;this.atkInt=setInterval(()=>{if(!document.querySelector('#battle-screen.active'))return;this.atkT+=0.1;this.updateAtkBar();if(this.atkT>=this.atkMax){this.resetAtk();this.monAttack()}},100)},
